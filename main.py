@@ -47,6 +47,7 @@ font_traininfo = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-Lig
 font_dayofweek = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-SemiBold.ttf'), 65)
 font_date = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 65)
 font_bigtemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 75)
+font_smalltemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 27)
 
 train_columns = [60, 133, 300, 403]
 train_line_offset = 19
@@ -93,8 +94,8 @@ def getTemp():
 def drawTemp(draw):
     temp = getTemp()
     draw.text((540,352), f'{temp["Average"]}°C', font = font_bigtemp, fill = 0)
-    #draw.text((360, 540), 'NORTHBOUND', font = font_direction, fill = 0)
-    print("Hello")
+    draw.text((695, 365),  f'{temp["High"]}°C', font = font_smalltemp, fill = 0)
+    draw.text((695, 400),  f'{temp["Low"]}°C', font = font_smalltemp, fill = 0)
 
 try:
     logging.info("epd7in5_V2 Demo")
