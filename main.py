@@ -5,18 +5,21 @@ import os
 from pathlib import Path
 from datetime import datetime
 import configparser
-config = configparser.ConfigParser()
-config.read('configuration.ini')
+import logging
+
+import requests
 
 from zeep import Client
 from zeep import xsd
 from zeep.plugins import HistoryPlugin
 
-import logging
 from waveshare_epd import epd7in5_V2
 import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
+
+config = configparser.ConfigParser()
+config.read('configuration.ini')
 
 LDB_TOKEN = config['tokens']['national_rail']
 WSDL = 'http://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01'
@@ -61,11 +64,35 @@ def drawDepartures(draw, y, now, departures):
         draw.text((train_columns[3], y), f'{time_until_minutes} MINS',  font = font_traininfo, fill = 0)
         y += train_line_offset
 
+def roundThenString(number):
+    return str(int(round(number)))
 def getTemp():
-    return 14
+    """Get Weather from Open Weather Map API
+
+    Params:
+    id -- the id of the town from http://bulk.openweathermap.org/sample/city.list.json.gz
+    units -- metric, imperial or kelvin
+    APPID -- API Key (Register Here: https://openweathermap.org/api)
+    """
+    endpoint = "https://api.openweathermap.org/data/2.5/weather"
+    params = {
+        "id": 6690565,
+        "units": "metric",
+        "APPID": config['tokens']['open_weather_map']
+    }
+    resp = requests.get(url=endpoint, params=params)
+    data = resp.json()
+    print(data)
+    temp = {
+        "Average": roundThenString(data['main']['temp']),
+        "High": roundThenString(data['main']['temp_max']),
+        "Low": roundThenString(data['main']['temp_min'])
+    }
+    return temp
 
 def drawTemp(draw):
-    draw.text((540,352), "14°C", font = font_bigtemp, fill = 0)
+    temp = getTemp()
+    draw.text((540,352), f'{temp["Average"]}°C', font = font_bigtemp, fill = 0)
     #draw.text((360, 540), 'NORTHBOUND', font = font_direction, fill = 0)
     print("Hello")
 
