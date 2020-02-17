@@ -48,7 +48,7 @@ font_dayofweek = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-Sem
 font_date = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 65)
 font_bigtemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 75)
 
-train_columns = [60, 133, 295, 403]
+train_columns = [60, 133, 300, 403]
 train_line_offset = 19
 def drawDepartures(draw, y, now, departures):
     services = departures.trainServices.service
