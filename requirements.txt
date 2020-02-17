@@ -1,0 +1,4 @@
+zeep==3.4.0
+spidev==3.4
+RPi.GPIO==0.7.0
+pillow==7.0.0
