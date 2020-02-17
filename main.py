@@ -115,15 +115,22 @@ try:
     dt_date = now.strftime("%d")
     dt_month = now.strftime("%b").upper()
     draw.text((40, 15), dt_string, font = font_time, fill = 0)
-    draw.text((428, 25), dt_dayofweek, font = font_dayofweek, fill = 0)
-    draw.text((565, 25), dt_date, font = font_date, fill = 0)
-    draw.text((635, 25), dt_month, font = font_date, fill = 0)
+    date_y = 25
+    
+    length_dayofweek = draw.textsize(dt_dayofweek, font = font_dayofweek)[0]
+    length_date = draw.textsize(dt_date, font = font_date)[0]
+    dayofweek_start_position = 428
+    date_start_position = dayofweek_start_position+length_dayofweek+10
+    month_start_position = date_start_position+length_date+10
+    date_x_positions = [dayofweek_start_position, date_start_position, month_start_position]
+    draw.text((date_x_positions[0], date_y), dt_dayofweek, font = font_dayofweek, fill = 0)
+    draw.text((date_x_positions[1], date_y), dt_date, font = font_date, fill = 0)
+    draw.text((date_x_positions[2], date_y), dt_month, font = font_date, fill = 0)
     draw.text((60, 168), 'NORTHBOUND', font = font_direction, fill = 0)
     drawDepartures(draw, 210, now, getDepartures(4, 'HRN', 'WIH'))
     draw.text((60, 312), 'SOUTHBOUND', font = font_direction, fill = 0)
     drawDepartures(draw, 356, now, getDepartures(4, 'HRN', 'FPK'))
     drawTemp(draw)
-    #draw.text((360, 540), 'NORTHBOUND', font = font_direction, fill = 0)
     
     Himage.save("preview.png")
     Himage.resize((epd.width*4, epd.height*4), Image.ANTIALIAS)
