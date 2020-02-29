@@ -57,8 +57,6 @@ def drawDepartures(draw, y, now, departures):
         services = departures.trainServices.service
         for service in services:
             now_hours = datetime.strptime(now.strftime("%H:%M"),'%H:%M') 
-        now_hours = datetime.strptime(now.strftime("%H:%M"),'%H:%M') 
-            now_hours = datetime.strptime(now.strftime("%H:%M"),'%H:%M') 
             arrival_time = datetime.strptime( service.std, '%H:%M')
             time_until = arrival_time - now_hours
             time_until_minutes = int(time_until.total_seconds() / 60)
@@ -78,7 +76,7 @@ def drawDepartures(draw, y, now, departures):
         #draw.text((train_columns[0], y), message,  font = font_traininfo, fill = 0)
         y_text = y
         for line in lines:
-            width, height = font_traininfo.getsize(line)
+            width, height = draw.textsize(line, font = font_traininfo)
             draw.text(((train_columns[0]), y_text), line, font=font_traininfo)
             y_text += height        
 
@@ -110,12 +108,20 @@ def getTemp():
     }
     return temp
 
-def drawTemp(draw):
-    temp = getTemp()
-    draw.text((540,352), f'{temp["Average"]}°C', font = font_bigtemp, fill = 0)
-    draw.text((695, 365),  f'{temp["High"]}°C', font = font_smalltemp, fill = 0)
-    draw.text((695, 400),  f'{temp["Low"]}°C', font = font_smalltemp, fill = 0)
+def smallTempPosition(text, tempEndPosition):
+    print(tempEndPosition)
+    text_length = draw.textsize(text, font = font_smalltemp)[0]
+    return tempEndPosition - text_length - 8
+    
 
+def drawTemp(draw, tempEndPosition):
+    temp = getTemp()
+    hightext = f'{temp["High"]}°C'
+    lowtext = f'{temp["Low"]}°C'
+    draw.text((smallTempPosition(hightext, tempEndPosition), 365),  hightext, font = font_smalltemp, fill = 0)
+    draw.text((smallTempPosition(lowtext, tempEndPosition), 400),  lowtext, font = font_smalltemp, fill = 0)
+    draw.text((560,352), f'{temp["Average"]}°C', font = font_bigtemp, fill = 0)
+    
 try:
     logging.info("epd7in5_V2 Demo")
 
@@ -138,6 +144,7 @@ try:
     
     length_dayofweek = draw.textsize(dt_dayofweek, font = font_dayofweek)[0]
     length_date = draw.textsize(dt_date, font = font_date)[0]
+    length_month = draw.textsize(dt_month, font = font_date)[0]
     dayofweek_start_position = 428
     date_start_position = dayofweek_start_position+length_dayofweek+10
     month_start_position = date_start_position+length_date+10
@@ -149,7 +156,7 @@ try:
     drawDepartures(draw, 210, now, getDepartures(4, 'HRN', 'WIH'))
     draw.text((60, 312), 'SOUTHBOUND', font = font_direction, fill = 0)
     drawDepartures(draw, 356, now, getDepartures(4, 'HRN', 'FPK'))
-    drawTemp(draw)
+    drawTemp(draw, month_start_position+length_month)
     
     Himage.save("preview.png")
 
