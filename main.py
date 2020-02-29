@@ -133,10 +133,6 @@ try:
     drawTemp(draw)
     
     Himage.save("preview.png")
-    Himage.resize((epd.width*4, epd.height*4), Image.ANTIALIAS)
-    Himage.resize((epd.width, epd.height), Image.ANTIALIAS)
-    Himage.save("preview2.png")
-
 
 
     epd.display(epd.getbuffer(Himage))
