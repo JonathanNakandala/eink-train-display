@@ -19,6 +19,9 @@ import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
 
+from svglib.svglib import svg2rlg
+from reportlab.graphics import renderPM
+
 config = configparser.ConfigParser()
 config.read('configuration.ini')
 stations = {
@@ -61,8 +64,11 @@ font_bigtemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-Extra
 font_smalltemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 27)
 
 def drawDeparturesIssue(draw, y, departures):
-    # When there are no trains at station display message
-    message = departures.nrccMessages.message[0]._value_1
+    # Either return blank or display engineering message
+    try:
+        message = departures.nrccMessages.message[0]._value_1
+    except:
+        return 0
     # The message is long with a link to their website, so split it at the .
     message = message.split('.', 1)[0]
     lines = textwrap.wrap(message, width=50)
@@ -85,6 +91,7 @@ def drawDepartures(draw, y, now, departures):
         services = departures.trainServices.service
     except:
       drawDeparturesIssue(draw, y,  departures)
+      return 0
 
     for service in services:
         now_hours = datetime.strptime(now.strftime("%H:%M"),'%H:%M') 
@@ -93,7 +100,7 @@ def drawDepartures(draw, y, now, departures):
         time_until_minutes = int(time_until.total_seconds() / 60)
         if time_until_minutes > 60:
             hours, minutes = divmod(time_until_minutes, 60)
-            time_until_text = f'{hours}HR {minutes} MINS'
+            time_until_text = f'{hours} HR {minutes} MINS'
         else: 
             time_until_text = f'{time_until_minutes} MINS'        
         print(time_until_minutes)
@@ -107,7 +114,7 @@ def drawDepartures(draw, y, now, departures):
 
 def roundThenString(number):
     return str(int(round(number)))
-def getTemp():
+def getWeather():
     """Get Weather from Open Weather Map API
 
     Params:
@@ -127,9 +134,36 @@ def getTemp():
     temp = {
         "Average": roundThenString(data['main']['temp']),
         "High": roundThenString(data['main']['temp_max']),
-        "Low": roundThenString(data['main']['temp_min'])
+        "Low": roundThenString(data['main']['temp_min']),
+        "Weather": data['weather'][0]['main']
     }
     return temp
+
+def loadSvgAsPIL(path):
+    return renderPM.drawToPIL(svg2rlg(path))
+
+def getWeatherIcon(weather):
+    if weather == "Thunderstorm":
+        return loadSvgAsPIL("./weather_icons/057-storm-7.svg")
+    if weather == "Drizzle":
+        return loadSvgAsPIL("./weather_icons/099-rain-4.svg")
+    if weather == "Rain":
+        return loadSvgAsPIL("./weather_icons/067-storm-6.svg")
+    if weather == "Snow":
+        return loadSvgAsPIL("./weather_icons/047-snow-4.svg")                
+    if weather == "Atmosphere":
+        return loadSvgAsPIL("./weather_icons/091-sunrise.svg")
+    if weather == "Clear":
+        return loadSvgAsPIL("./weather_icons/013-sun-8.svg")
+    if weather == "Clouds":
+        return loadSvgAsPIL("./weather_icons/051-cloud-3.svg")                
+
+def drawWeather(image, weather):
+    icon = getWeatherIcon(weather)
+    icon.thumbnail((160,165), Image.ANTIALIAS)
+    image.paste(icon, (550,170))
+
+
 
 def smallTempPosition(text, tempEndPosition):
     print(tempEndPosition)
@@ -137,13 +171,14 @@ def smallTempPosition(text, tempEndPosition):
     return tempEndPosition - text_length - 8
     
 
-def drawTemp(draw, tempEndPosition):
-    temp = getTemp()
+def drawTemp(image, draw, tempEndPosition):
+    temp = getWeather()
     hightext = f'{temp["High"]}°C'
     lowtext = f'{temp["Low"]}°C'
     draw.text((smallTempPosition(hightext, tempEndPosition), 365),  hightext, font = font_smalltemp, fill = 0)
     draw.text((smallTempPosition(lowtext, tempEndPosition), 400),  lowtext, font = font_smalltemp, fill = 0)
     draw.text((560,352), f'{temp["Average"]}°C', font = font_bigtemp, fill = 0)
+    drawWeather(image, temp['Weather'])
     
 try:
     logging.info("epd7in5_V2 Demo")
@@ -179,6 +214,7 @@ try:
     drawDepartures(draw, 210, now, getDepartures(4, stations['North']['from'], stations['North']['to']))
     draw.text((60, 312), 'SOUTHBOUND', font = font_direction, fill = 0)
     drawDepartures(draw, 356, now, getDepartures(4, stations['South']['from'], stations['South']['to']))
+    drawTemp(Himage, draw, month_start_position+length_month)
     
     Himage.save("preview.png")
 
