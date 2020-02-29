@@ -23,7 +23,7 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 
 config = configparser.ConfigParser()
-config.read('configuration.ini')
+config.read(os.path.join(Path(__file__).parent,'configuration.ini'))
 stations = {
     'North': {
         'from': config['stations']['northbound_from'],
