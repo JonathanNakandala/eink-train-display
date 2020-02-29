@@ -50,7 +50,11 @@ font_date = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLig
 font_bigtemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 75)
 font_smalltemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 27)
 
-train_columns = [60, 133, 300, 403]
+train_columns = [0,0,0,0]
+train_columns[0] = 60
+train_columns[1] = train_columns[0] + 73
+train_columns[2] = train_columns[1] + 167
+train_columns[3] = train_columns[2] + 103
 train_line_offset = 19
 def drawDepartures(draw, y, now, departures):
     try:
