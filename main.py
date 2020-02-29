@@ -21,6 +21,16 @@ import traceback
 
 config = configparser.ConfigParser()
 config.read('configuration.ini')
+stations = {
+    'North': {
+        'from': config['stations']['northbound_from'],
+        'to': config['stations']['northbound_to']
+    },
+    'South': {
+        'from': config['stations']['southbound_from'],
+        'to': config['stations']['sountbound_to']
+    }
+}
 
 LDB_TOKEN = config['tokens']['national_rail']
 WSDL = 'http://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01'
@@ -107,7 +117,7 @@ def getTemp():
     """
     endpoint = "https://api.openweathermap.org/data/2.5/weather"
     params = {
-        "id": 6690565,
+        "id": config['weather']['townID'],
         "units": "metric",
         "APPID": config['tokens']['open_weather_map']
     }
@@ -166,10 +176,9 @@ try:
     draw.text((date_x_positions[1], date_y), dt_date, font = font_date, fill = 0)
     draw.text((date_x_positions[2], date_y), dt_month, font = font_date, fill = 0)
     draw.text((60, 168), 'NORTHBOUND', font = font_direction, fill = 0)
-    drawDepartures(draw, 210, now, getDepartures(4, 'HRN', 'WIH'))
+    drawDepartures(draw, 210, now, getDepartures(4, stations['North']['from'], stations['North']['to']))
     draw.text((60, 312), 'SOUTHBOUND', font = font_direction, fill = 0)
-    drawDepartures(draw, 356, now, getDepartures(4, 'HRN', 'FPK'))
-    drawTemp(draw, month_start_position+length_month)
+    drawDepartures(draw, 356, now, getDepartures(4, stations['South']['from'], stations['South']['to']))
     
     Himage.save("preview.png")
 
