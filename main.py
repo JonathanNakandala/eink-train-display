@@ -50,6 +50,20 @@ font_date = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLig
 font_bigtemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 75)
 font_smalltemp = ImageFont.truetype(os.path.join(fontdir, 'Overpass/Overpass-ExtraLight.ttf'), 27)
 
+def drawDeparturesIssue(draw, y, departures):
+    # When there are no trains at station display message
+    message = departures.nrccMessages.message[0]._value_1
+    # The message is long with a link to their website, so split it at the .
+    message = message.split('.', 1)[0]
+    lines = textwrap.wrap(message, width=50)
+    print(message)
+    #draw.text((train_columns[0], y), message,  font = font_traininfo, fill = 0)
+    y_text = y
+    for line in lines:
+        width, height = draw.textsize(line, font = font_traininfo)
+        draw.text(((train_columns[0]), y_text), line, font=font_traininfo)
+        y_text += height  
+
 train_columns = [0,0,0,0]
 train_columns[0] = 60
 train_columns[1] = train_columns[0] + 73
@@ -59,30 +73,25 @@ train_line_offset = 19
 def drawDepartures(draw, y, now, departures):
     try:
         services = departures.trainServices.service
-        for service in services:
-            now_hours = datetime.strptime(now.strftime("%H:%M"),'%H:%M') 
-            arrival_time = datetime.strptime( service.std, '%H:%M')
-            time_until = arrival_time - now_hours
-            time_until_minutes = int(time_until.total_seconds() / 60)
-            print(time_until_minutes)
-            draw.text((train_columns[0], y), service.std,  font = font_traininfo, fill = 0)
-            draw.text((train_columns[1], y), service.destination.location[0].locationName.upper(),  font = font_traininfo, fill = 0)
-            draw.text((train_columns[2], y), service.etd.upper(),  font = font_traininfo, fill = 0)
-            draw.text((train_columns[3], y), f'{time_until_minutes} MINS',  font = font_traininfo, fill = 0)
-            y += train_line_offset
     except:
-        # When there are no trains at station display message
-        message = departures.nrccMessages.message[0]._value_1
-        # The message is long with a link to their website, so split it at the .
-        message = message.split('.', 1)[0]
-        lines = textwrap.wrap(message, width=50)
-        print(message)
-        #draw.text((train_columns[0], y), message,  font = font_traininfo, fill = 0)
-        y_text = y
-        for line in lines:
-            width, height = draw.textsize(line, font = font_traininfo)
-            draw.text(((train_columns[0]), y_text), line, font=font_traininfo)
-            y_text += height        
+      drawDeparturesIssue(draw, y,  departures)
+
+    for service in services:
+        now_hours = datetime.strptime(now.strftime("%H:%M"),'%H:%M') 
+        arrival_time = datetime.strptime( service.std, '%H:%M')
+        time_until = arrival_time - now_hours
+        time_until_minutes = int(time_until.total_seconds() / 60)
+        if time_until_minutes > 60:
+            hours, minutes = divmod(time_until_minutes, 60)
+            time_until_text = f'{hours}HR {minutes} MINS'
+        else: 
+            time_until_text = f'{time_until_minutes} MINS'        
+        print(time_until_minutes)
+        draw.text((train_columns[0], y), service.std,  font = font_traininfo, fill = 0)
+        draw.text((train_columns[1], y), service.destination.location[0].locationName.upper(),  font = font_traininfo, fill = 0)
+        draw.text((train_columns[2], y), service.etd.upper(),  font = font_traininfo, fill = 0)
+        draw.text((train_columns[3], y), time_until_text,  font = font_traininfo, fill = 0)
+        y += train_line_offset
 
 
 
