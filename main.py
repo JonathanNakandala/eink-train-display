@@ -181,25 +181,25 @@ def drawTemp(image, draw, tempEndPosition):
     drawWeather(image, temp['Weather'])
     
 try:
-    logging.info("epd7in5_V2 Demo")
-
+    
     epd = epd7in5_V2.EPD()
-    logging.info("init and Clear")
+    logging.info("Initialising the display...")
     epd.init()
     #epd.Clear()
 
-    # Drawing on the Horizontal image
-    logging.info("1.Drawing on the Horizontal image...")
+    # Create blank monochrome image to draw onto
     Himage = Image.new('1', (epd.width, epd.height), 255)  # 255: clear the frame
     draw = ImageDraw.Draw(Himage)
+    logging.info("Drawing the time")
     now = datetime.now()
-    dt_string = now.strftime("%H:%M")
+    time_string = now.strftime("%H:%M")
+    draw.text((40, 15), time_string, font = font_time, fill = 0)
+
+    logging.info("Drawing the date")
     dt_dayofweek = now.strftime("%a").upper()
     dt_date = now.strftime("%d")
     dt_month = now.strftime("%b").upper()
-    draw.text((40, 15), dt_string, font = font_time, fill = 0)
     date_y = 25
-    
     length_dayofweek = draw.textsize(dt_dayofweek, font = font_dayofweek)[0]
     length_date = draw.textsize(dt_date, font = font_date)[0]
     length_month = draw.textsize(dt_month, font = font_date)[0]
@@ -210,18 +210,18 @@ try:
     draw.text((date_x_positions[0], date_y), dt_dayofweek, font = font_dayofweek, fill = 0)
     draw.text((date_x_positions[1], date_y), dt_date, font = font_date, fill = 0)
     draw.text((date_x_positions[2], date_y), dt_month, font = font_date, fill = 0)
+
+    logging.info("Drawing the Train Arrivals")
     draw.text((60, 168), 'NORTHBOUND', font = font_direction, fill = 0)
     drawDepartures(draw, 210, now, getDepartures(4, stations['North']['from'], stations['North']['to']))
     draw.text((60, 312), 'SOUTHBOUND', font = font_direction, fill = 0)
     drawDepartures(draw, 356, now, getDepartures(4, stations['South']['from'], stations['South']['to']))
     drawTemp(Himage, draw, month_start_position+length_month)
     
+    logging.info("Displaying image and saving preview.png")
     Himage.save("preview.png")
-
-
     epd.display(epd.getbuffer(Himage))
-
-    logging.info("Goto Sleep...")
+    logging.info("Sending Display to Sleep")
     epd.sleep()
 
 except IOError as e:
