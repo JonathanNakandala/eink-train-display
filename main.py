@@ -187,7 +187,7 @@ def drawWeather(image, weather):
     image.paste(icon, (550, 170))
 
 
-def smallTempPosition(text, tempEndPosition):
+def smallTempPosition(draw, text, tempEndPosition):
     print(tempEndPosition)
     text_length = draw.textsize(text, font=font_smalltemp)[0]
     return tempEndPosition - text_length - 8
@@ -197,67 +197,73 @@ def drawTemp(image, draw, tempEndPosition):
     temp = getWeather()
     hightext = f'{temp["High"]}°C'
     lowtext = f'{temp["Low"]}°C'
-    draw.text((smallTempPosition(hightext, tempEndPosition), 365),
+    draw.text((smallTempPosition(draw, hightext, tempEndPosition), 365),
               hightext, font=font_smalltemp, fill=0)
-    draw.text((smallTempPosition(lowtext, tempEndPosition), 400),
+    draw.text((smallTempPosition(draw, lowtext, tempEndPosition), 400),
               lowtext, font=font_smalltemp, fill=0)
     draw.text((560, 352), f'{temp["Average"]}°C', font=font_bigtemp, fill=0)
     drawWeather(image, temp['Weather'])
 
 
-try:
+def main():
+    try:
 
-    epd = epd7in5_V2.EPD()
-    logging.info("Initialising the display...")
-    epd.init()
-    # epd.Clear()
+        epd = epd7in5_V2.EPD()
+        logging.info("Initialising the display...")
+        epd.init()
+        # epd.Clear()
 
-    # Create blank monochrome image to draw onto
-    Himage = Image.new('1', (epd.width, epd.height),
-                       255)  # 255: clear the frame
-    draw = ImageDraw.Draw(Himage)
-    logging.info("Drawing the time")
-    now = datetime.now()
-    time_string = now.strftime("%H:%M")
-    draw.text((40, 15), time_string, font=font_time, fill=0)
+        # Create blank monochrome image to draw onto
+        Himage = Image.new('1', (epd.width, epd.height),
+                           255)  # 255: clear the frame
+        draw = ImageDraw.Draw(Himage)
+        logging.info("Drawing the time")
+        now = datetime.now()
+        time_string = now.strftime("%H:%M")
+        draw.text((40, 15), time_string, font=font_time, fill=0)
 
-    logging.info("Drawing the date")
-    dt_dayofweek = now.strftime("%a").upper()
-    dt_date = now.strftime("%d")
-    dt_month = now.strftime("%b").upper()
-    date_y = 25
-    length_dayofweek = draw.textsize(dt_dayofweek, font=font_dayofweek)[0]
-    length_date = draw.textsize(dt_date, font=font_date)[0]
-    length_month = draw.textsize(dt_month, font=font_date)[0]
-    dayofweek_start_position = 428
-    date_start_position = dayofweek_start_position+length_dayofweek+10
-    month_start_position = date_start_position+length_date+10
-    date_x_positions = [dayofweek_start_position,
-                        date_start_position, month_start_position]
-    draw.text((date_x_positions[0], date_y),
-              dt_dayofweek, font=font_dayofweek, fill=0)
-    draw.text((date_x_positions[1], date_y), dt_date, font=font_date, fill=0)
-    draw.text((date_x_positions[2], date_y), dt_month, font=font_date, fill=0)
+        logging.info("Drawing the date")
+        dt_dayofweek = now.strftime("%a").upper()
+        dt_date = now.strftime("%d")
+        dt_month = now.strftime("%b").upper()
+        date_y = 25
+        length_dayofweek = draw.textsize(dt_dayofweek, font=font_dayofweek)[0]
+        length_date = draw.textsize(dt_date, font=font_date)[0]
+        length_month = draw.textsize(dt_month, font=font_date)[0]
+        dayofweek_start_position = 428
+        date_start_position = dayofweek_start_position+length_dayofweek+10
+        month_start_position = date_start_position+length_date+10
+        date_x_positions = [dayofweek_start_position,
+                            date_start_position, month_start_position]
+        draw.text((date_x_positions[0], date_y),
+                  dt_dayofweek, font=font_dayofweek, fill=0)
+        draw.text((date_x_positions[1], date_y),
+                  dt_date, font=font_date, fill=0)
+        draw.text((date_x_positions[2], date_y),
+                  dt_month, font=font_date, fill=0)
 
-    logging.info("Drawing the Train Arrivals")
-    draw.text((60, 168), 'NORTHBOUND', font=font_direction, fill=0)
-    drawDepartures(draw, 210, now, getDepartures(
-        4, stations['North']['from'], stations['North']['to']))
-    draw.text((60, 312), 'SOUTHBOUND', font=font_direction, fill=0)
-    drawDepartures(draw, 356, now, getDepartures(
-        4, stations['South']['from'], stations['South']['to']))
-    drawTemp(Himage, draw, month_start_position+length_month)
+        logging.info("Drawing the Train Arrivals")
+        draw.text((60, 168), 'NORTHBOUND', font=font_direction, fill=0)
+        drawDepartures(draw, 210, now, getDepartures(
+            4, stations['North']['from'], stations['North']['to']))
+        draw.text((60, 312), 'SOUTHBOUND', font=font_direction, fill=0)
+        drawDepartures(draw, 356, now, getDepartures(
+            4, stations['South']['from'], stations['South']['to']))
+        drawTemp(Himage, draw, month_start_position+length_month)
 
-    logging.info("Displaying image and saving preview.png")
-    Himage.save("preview.png")
-    epd.display(epd.getbuffer(Himage))
-    logging.info("Sending Display to Sleep")
-    epd.sleep()
+        logging.info("Displaying image and saving preview.png")
+        Himage.save("preview.png")
+        epd.display(epd.getbuffer(Himage))
+        logging.info("Sending Display to Sleep")
+        epd.sleep()
 
-except IOError as e:
-    logging.info(e)
+    except IOError as e:
+        logging.info(e)
 
-except KeyboardInterrupt:
-    logging.info("ctrl + c:")
-    epd7in5.epdconfig.module_exit()
-    exit()
+    except KeyboardInterrupt:
+        logging.info("ctrl + c:")
+        epd7in5.epdconfig.module_exit()
+        exit()
+
+
+main()
