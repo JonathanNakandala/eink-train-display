@@ -47,9 +47,23 @@ header = xsd.Element(
 header_value = header(TokenValue=LDB_TOKEN)
 
 
-def getDepartures(numRows, atStation, toStation):
+def get_departures(num_rows, at_station, to_station):
+    """
+    Gets Departures from a station based on From and to
+
+    Args:
+        num_rows: Number of Results
+        at_station: 3 Letter Station CRS Station Code
+        to_station: 3 Letter Station CRS Station Code
+
+    Returns:
+        _description_
+    """
     response = client.service.GetDepartureBoard(
-        numRows=numRows, crs=atStation, filterCrs=toStation, _soapheaders=[header_value]
+        numRows=num_rows,
+        crs=at_station,
+        filterCrs=to_station,
+        _soapheaders=[header_value],
     )
     return response
 
@@ -264,14 +278,14 @@ def main():
             draw,
             210,
             now,
-            getDepartures(4, stations["North"]["from"], stations["North"]["to"]),
+            get_departures(4, stations["North"]["from"], stations["North"]["to"]),
         )
         draw.text((60, 312), "SOUTHBOUND", font=font_direction, fill=0)
         drawDepartures(
             draw,
             356,
             now,
-            getDepartures(4, stations["South"]["from"], stations["South"]["to"]),
+            get_departures(4, stations["South"]["from"], stations["South"]["to"]),
         )
         drawTemp(Himage, draw, month_start_position + length_month)
 
