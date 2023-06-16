@@ -31,6 +31,7 @@ class OpenWeather:
             "units": units,
             "APPID": self.token,
         }
+        log.info("Getting Weather Data", location=town_id, units=units)
         response = httpx.get(url=self.endpoint + "weather", params=params).json()
         return WeatherData(**response)
 
@@ -43,6 +44,7 @@ class OpenWeather:
             "lon": lon,
             "appid": self.token,
         }
+        log.info("Getting Air Quality Data", lat=lat, lon=lon)
         response = httpx.get(url=self.endpoint + "air_pollution", params=params).json()
         log.info("API Data", data=response)
         return AirQualityData(**response)

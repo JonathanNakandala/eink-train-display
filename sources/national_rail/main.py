@@ -10,7 +10,7 @@ from zeep.plugins import HistoryPlugin
 
 from .models import DeparturesResponse
 
-logger = structlog.get_logger()
+log = structlog.get_logger()
 
 
 class NationalRail:
@@ -49,6 +49,12 @@ class NationalRail:
         """
 
         try:
+            log.info(
+                "Getting National Rail Departures",
+                rows=num_rows,
+                at_station=at_station,
+                to_station=to_station,
+            )
             response = self.client.service.GetDepartureBoard(
                 numRows=num_rows,
                 crs=at_station,
@@ -57,7 +63,7 @@ class NationalRail:
             )
             return DeparturesResponse(**serialize_object(response))
         except Fault as error:
-            logger.error(
+            log.error(
                 "Error getting departure information from National Rail",
                 service="departureBoard",
                 exc_info=True,
