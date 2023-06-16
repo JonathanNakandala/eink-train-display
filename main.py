@@ -9,14 +9,16 @@ import textwrap
 from datetime import datetime
 from pathlib import Path
 
+import structlog
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from reportlab.graphics import renderPM
 from svglib.svglib import svg2rlg
-from zeep import Client, xsd
-from zeep.plugins import HistoryPlugin
 
+from sources import NationalRail
 from waveshare_epd import epd7in5_V2, epdconfig
+
+log = structlog.get_logger()
 
 config = configparser.ConfigParser()
 config.read(os.path.join(Path(__file__).parent, "configuration.ini"))
@@ -31,47 +33,9 @@ stations = {
     },
 }
 
-LDB_TOKEN = config["tokens"]["national_rail"]
-WSDL = "http://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01"
-history = HistoryPlugin()
-client = Client(wsdl=WSDL, plugins=[history])
-header = xsd.Element(
-    "{http://thalesgroup.com/RTTI/2013-11-28/Token/types}AccessToken",
-    xsd.ComplexType(
-        [
-            xsd.Element(
-                "{http://thalesgroup.com/RTTI/2013-11-28/Token/types}TokenValue",
-                xsd.String(),
-            ),
-        ]
-    ),
-)
-header_value = header(TokenValue=LDB_TOKEN)
-
-
-def get_departures(num_rows, at_station, to_station):
-    """
-    Gets Departures from a station based on From and to
-
-    Args:
-        num_rows: Number of Results
-        at_station: 3 Letter Station CRS Station Code
-        to_station: 3 Letter Station CRS Station Code
-
-    Returns:
-        _description_
-    """
-    response = client.service.GetDepartureBoard(
-        numRows=num_rows,
-        crs=at_station,
-        filterCrs=to_station,
-        _soapheaders=[header_value],
-    )
-    return response
-
 
 fontdir = os.path.join(Path(__file__).parent, "fonts")
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 print(os.path.join(fontdir, "Overpass/Overpass-ExtraLight.ttf"))
 font_time = ImageFont.truetype(
     os.path.join(fontdir, "Overpass/Overpass-ExtraLight.ttf"), 95
@@ -316,23 +280,31 @@ def draw_temp(image, draw: ImageDraw, temp_end_position):
     draw_weather(image, temp["Weather"])
 
 
+def send_to_display(pil_image):
+    """
+    Send Data to Display
+    """
+    epd = epd7in5_V2.EPD()
+    # epd.Clear()
+    log.info("Initialising the display...")
+    epd.init()
+    epd.display(epd.getbuffer(pil_image))
+    log.info("Sending Display to Sleep")
+    epd.sleep()
+
+
 def main():
     """Program Entrypoint"""
     try:
-        epd = epd7in5_V2.EPD()
-        logging.info("Initialising the display...")
-        epd.init()
-        # epd.Clear()
-
         # Create blank monochrome image to draw onto
-        pil_image = Image.new("1", (epd.width, epd.height), 255)  # 255: clear the frame
+        pil_image = Image.new("1", (800, 480), 255)  # 255: clear the frame
         draw = ImageDraw.Draw(pil_image)
-        logging.info("Drawing the time")
+        log.info("Drawing the time")
         now = datetime.now()
         time_string = now.strftime("%H:%M")
         draw.text((40, 15), time_string, font=font_time, fill=0)
 
-        logging.info("Drawing the date")
+        log.info("Drawing the date")
         dt_dayofweek = now.strftime("%a").upper()
         dt_date = now.strftime("%d")
         dt_month = now.strftime("%b").upper()
@@ -354,34 +326,36 @@ def main():
         draw.text((date_x_positions[1], date_y), dt_date, font=font_date, fill=0)
         draw.text((date_x_positions[2], date_y), dt_month, font=font_date, fill=0)
 
-        logging.info("Drawing the Train Arrivals")
+        log.info("Drawing the Train Arrivals")
+        rail_client = NationalRail.NationalRail(config["tokens"]["national_rail"])
         draw.text((60, 168), "NORTHBOUND", font=font_direction, fill=0)
         draw_departures(
             draw,
             210,
             now,
-            get_departures(4, stations["North"]["from"], stations["North"]["to"]),
+            rail_client.get_departures(
+                4, stations["North"]["from"], stations["North"]["to"]
+            ),
         )
         draw.text((60, 312), "SOUTHBOUND", font=font_direction, fill=0)
         draw_departures(
             draw,
             356,
             now,
-            get_departures(4, stations["South"]["from"], stations["South"]["to"]),
+            rail_client.get_departures(
+                4, stations["South"]["from"], stations["South"]["to"]
+            ),
         )
         draw_temp(pil_image, draw, month_start_position + length_month)
 
-        logging.info("Displaying image and saving preview.png")
+        log.info("Displaying image and saving preview.png")
         pil_image.save("preview.png")
-        epd.display(epd.getbuffer(pil_image))
-        logging.info("Sending Display to Sleep")
-        epd.sleep()
 
     except IOError as exception:
-        logging.info(exception)
+        log.info(exception)
 
     except KeyboardInterrupt:
-        logging.info("ctrl + c:")
+        log.info("ctrl + c:")
         epdconfig.RaspberryPi().module_exit()
         sys.exit()
 

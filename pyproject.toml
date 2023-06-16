@@ -3,8 +3,11 @@ name = "eink-train-display"
 version = "0.1.0"
 description = "Waveshare eink display program"
 authors = ["Jonathan Nakandala <jonathannakandala@gmail.com>"]
-readme = "README.md"
-packages = [{include = "eink_train_display"}]
+readme = "readme.md"
+packages = [
+    { include = "national_rail", from = "sources" },
+    { include = "sources" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -13,6 +16,8 @@ spidev = "3.4"
 "RPi.GPIO" = "0.7.1"
 Pillow = "8.3.2"
 svglib = "0.9.4"
+pydantic = "^1.10.9"
+structlog = "^23.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
@@ -22,3 +27,6 @@ pytest = "^7.3.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pylint.'MESSAGES CONTROL']
+extension-pkg-whitelist = "pydantic"
