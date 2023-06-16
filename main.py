@@ -188,57 +188,101 @@ def get_weather():
     return temp
 
 
-def loadSvgAsPIL(path):
+def load_svg_to_pil(path: str):
+    """
+    Load svg as a Pillow Image
+
+    Args:
+        path: path to svg
+
+    Returns:
+        Image
+    """
     return renderPM.drawToPIL(svg2rlg(path))
 
 
-def getWeatherIcon(weather):
+def get_weather_icon(weather):
+    """
+    Returns the Pillow Image for the Weather Icon
+
+    Args:
+        weather: Weather Types
+
+    Returns:
+        Image
+    """
+
     if weather == "Thunderstorm":
-        return loadSvgAsPIL("./weather_icons/057-storm-7.svg")
+        return load_svg_to_pil("./weather_icons/057-storm-7.svg")
     if weather == "Drizzle":
-        return loadSvgAsPIL("./weather_icons/099-rain-4.svg")
+        return load_svg_to_pil("./weather_icons/099-rain-4.svg")
     if weather == "Rain":
-        return loadSvgAsPIL("./weather_icons/067-storm-6.svg")
+        return load_svg_to_pil("./weather_icons/067-storm-6.svg")
     if weather == "Snow":
-        return loadSvgAsPIL("./weather_icons/047-snow-4.svg")
+        return load_svg_to_pil("./weather_icons/047-snow-4.svg")
     if weather == "Atmosphere":
-        return loadSvgAsPIL("./weather_icons/091-sunrise.svg")
+        return load_svg_to_pil("./weather_icons/091-sunrise.svg")
     if weather == "Clear":
-        return loadSvgAsPIL("./weather_icons/013-sun-8.svg")
+        return load_svg_to_pil("./weather_icons/013-sun-8.svg")
     if weather == "Clouds":
-        return loadSvgAsPIL("./weather_icons/051-cloud-3.svg")
+        return load_svg_to_pil("./weather_icons/051-cloud-3.svg")
 
 
-def drawWeather(image, weather):
-    icon = getWeatherIcon(weather)
+def draw_weather(image, weather):
+    """
+    Draws the Weather Icon
+
+    Args:
+        image: the image canvas to draw onto to
+        weather: Weather description
+    """
+    icon = get_weather_icon(weather)
     icon.thumbnail((160, 165), Image.ANTIALIAS)
     image.paste(icon, (550, 170))
 
 
-def smallTempPosition(draw, text, tempEndPosition):
-    print(tempEndPosition)
+def small_temp_position(draw, text, temp_end_position):
+    """
+    Determines the position for the small temperature (min/max)
+    Args:
+        draw: _description_
+        text: _description_
+        temp_end_position: _description_
+
+    Returns:
+        Position
+    """
+    print(temp_end_position)
     text_length = draw.textsize(text, font=font_smalltemp)[0]
-    return tempEndPosition - text_length - 8
+    return temp_end_position - text_length - 8
 
 
-def drawTemp(image, draw, tempEndPosition):
+def draw_temp(image, draw: ImageDraw, temp_end_position):
+    """
+    Draw the temperature, min/max and icon
+
+    Args:
+        image: _description_
+        draw: _description_
+        temp_end_position: _description_
+    """
     temp = get_weather()
     hightext = f'{temp["High"]}°C'
     lowtext = f'{temp["Low"]}°C'
     draw.text(
-        (smallTempPosition(draw, hightext, tempEndPosition), 365),
+        (small_temp_position(draw, hightext, temp_end_position), 365),
         hightext,
         font=font_smalltemp,
         fill=0,
     )
     draw.text(
-        (smallTempPosition(draw, lowtext, tempEndPosition), 400),
+        (small_temp_position(draw, lowtext, temp_end_position), 400),
         lowtext,
         font=font_smalltemp,
         fill=0,
     )
     draw.text((560, 352), f'{temp["Average"]}°C', font=font_bigtemp, fill=0)
-    drawWeather(image, temp["Weather"])
+    draw_weather(image, temp["Weather"])
 
 
 def main():
@@ -293,7 +337,7 @@ def main():
             now,
             get_departures(4, stations["South"]["from"], stations["South"]["to"]),
         )
-        drawTemp(pil_image, draw, month_start_position + length_month)
+        draw_temp(pil_image, draw, month_start_position + length_month)
 
         logging.info("Displaying image and saving preview.png")
         pil_image.save("preview.png")
