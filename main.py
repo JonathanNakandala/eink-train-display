@@ -295,8 +295,8 @@ def main():
         logging.info("Sending Display to Sleep")
         epd.sleep()
 
-    except IOError as e:
-        logging.info(e)
+    except IOError as exception:
+        logging.info(exception)
 
     except KeyboardInterrupt:
         logging.info("ctrl + c:")
