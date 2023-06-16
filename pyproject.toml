@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "eink-train-display"
+version = "0.1.0"
+description = "Waveshare eink display program"
+authors = ["Jonathan Nakandala <jonathannakandala@gmail.com>"]
+readme = "README.md"
+packages = [{include = "eink_train_display"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+zeep = "3.4.0"
+spidev = "3.4"
+"RPi.GPIO" = "0.7.1"
+Pillow = "8.3.2"
+svglib = "0.9.4"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+pylint = "^2.17.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
