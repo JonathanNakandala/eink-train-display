@@ -1,26 +1,20 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
-import sys
-import os
-from pathlib import Path
-from datetime import datetime
 import configparser
 import logging
-
+import os
 import textwrap
-import requests
+from datetime import datetime
+from pathlib import Path
 
-from zeep import Client
-from zeep import xsd
+import requests
+from PIL import Image, ImageDraw, ImageFont
+from reportlab.graphics import renderPM
+from svglib.svglib import svg2rlg
+from zeep import Client, xsd
 from zeep.plugins import HistoryPlugin
 
 from waveshare_epd import epd7in5_V2
-import time
-from PIL import Image, ImageDraw, ImageFont
-import traceback
-
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPM
 
 config = configparser.ConfigParser()
 config.read(os.path.join(Path(__file__).parent, "configuration.ini"))
