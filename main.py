@@ -1,5 +1,6 @@
-#!/usr/bin/python
-# -*- coding:utf-8 -*-
+"""
+Home Dashboard for a WaveShare 7.5 e-ink display with Raspberry PI
+"""
 import configparser
 import logging
 import os
