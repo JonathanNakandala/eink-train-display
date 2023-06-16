@@ -10,12 +10,11 @@ from datetime import datetime
 from pathlib import Path
 
 import structlog
-import requests
 from PIL import Image, ImageDraw, ImageFont
 from reportlab.graphics import renderPM
 from svglib.svglib import svg2rlg
 
-from sources import NationalRail
+from sources import NationalRail, Weather
 from waveshare_epd import epd7in5_V2, epdconfig
 
 log = structlog.get_logger()
@@ -157,28 +156,14 @@ def get_weather():
     """
     Get Weather from Open Weather Map API
 
-    Args:
-    id: the id of the town from http://bulk.openweathermap.org/sample/city.list.json.gz
-    unit: metric, imperial or kelvin
-    app_id: API Key (Register Here: https://openweathermap.org/api)
-
-    Returns:
-    Temperature Data
     """
-    endpoint = "https://api.openweathermap.org/data/2.5/weather"
-    params = {
-        "id": config["weather"]["townID"],
-        "units": "metric",
-        "APPID": config["tokens"]["open_weather_map"],
-    }
-    resp = requests.get(url=endpoint, params=params, timeout=10)
-    data = resp.json()
-    print(data)
+    client = Weather.OpenWeather(token=config["tokens"]["open_weather_map"])
+    data = client.get_weather(config["weather"]["townID"], "metric")
     temp = {
-        "Average": round_number_to_string(data["main"]["temp"]),
-        "High": round_number_to_string(data["main"]["temp_max"]),
-        "Low": round_number_to_string(data["main"]["temp_min"]),
-        "Weather": data["weather"][0]["main"],
+        "Average": round_number_to_string(data.main.temp),
+        "High": round_number_to_string(data.main.temp_max),
+        "Low": round_number_to_string(data.main.temp_min),
+        "Weather": data.weather[0].main,
     }
     return temp
 
