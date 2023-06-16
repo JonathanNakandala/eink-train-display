@@ -156,13 +156,17 @@ def roundThenString(number):
     return str(int(round(number)))
 
 
-def getWeather():
-    """Get Weather from Open Weather Map API
+def get_weather():
+    """
+    Get Weather from Open Weather Map API
 
-    Params:
-    id -- the id of the town from http://bulk.openweathermap.org/sample/city.list.json.gz
-    units -- metric, imperial or kelvin
-    APPID -- API Key (Register Here: https://openweathermap.org/api)
+    Args:
+    id: the id of the town from http://bulk.openweathermap.org/sample/city.list.json.gz
+    unit: metric, imperial or kelvin
+    app_id: API Key (Register Here: https://openweathermap.org/api)
+
+    Returns:
+    Temperature Data
     """
     endpoint = "https://api.openweathermap.org/data/2.5/weather"
     params = {
@@ -170,7 +174,7 @@ def getWeather():
         "units": "metric",
         "APPID": config["tokens"]["open_weather_map"],
     }
-    resp = requests.get(url=endpoint, params=params)
+    resp = requests.get(url=endpoint, params=params, timeout=10)
     data = resp.json()
     print(data)
     temp = {
@@ -216,7 +220,7 @@ def smallTempPosition(draw, text, tempEndPosition):
 
 
 def drawTemp(image, draw, tempEndPosition):
-    temp = getWeather()
+    temp = get_weather()
     hightext = f'{temp["High"]}°C'
     lowtext = f'{temp["Low"]}°C'
     draw.text(
