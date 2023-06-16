@@ -1,0 +1,8 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "black",
+    "autoDocstring.docstringFormat": "google-notypes",
+    "autoDocstring.startOnNewLine": true
+}
