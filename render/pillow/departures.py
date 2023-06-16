@@ -101,7 +101,7 @@ def draw_departures(draw: ImageDraw, y_position, time_now: datetime, departures)
         )
         draw.text(
             (train_columns[1], y_position),
-            service.destination.location[0].locationName.upper(),
+            service.destination.location[0].locationName.upper()[0:17],
             font=fonts.font_traininfo,
             fill=0,
         )
