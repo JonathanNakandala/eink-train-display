@@ -66,7 +66,7 @@ def main():
 
         log.info("Displaying image and saving preview.png")
         pil_image.save("preview.png")
-
+        send_to_display(pil_image)
     except IOError as exception:
         log.info(exception)
 

@@ -149,6 +149,31 @@ class Dummy:
     Does Nothing
     """
 
+    RST_PIN = 17
+    DC_PIN = 25
+    CS_PIN = 8
+    BUSY_PIN = 24
+
+    def digital_write(self, pin, value):
+        """Dummy"""
+
+    def digital_read(self, pin):
+        """Dummy"""
+
+    def delay_ms(self, delaytime):
+        """Dummy"""
+
+    def spi_writebyte(self, data):
+        """Dummy"""
+
+    def module_init(self):
+        """Dummy"""
+        return 0
+
+    def module_exit(self):
+        """Dummy"""
+        logging.debug("spi end")
+
 
 if os.path.exists("/sys/bus/platform/drivers/gpiomem-bcm2835"):
     implementation = RaspberryPi()
