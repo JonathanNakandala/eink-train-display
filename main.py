@@ -153,7 +153,8 @@ def drawDepartures(draw, y, now, departures):
         y += train_line_offset
 
 
-def roundThenString(number):
+def round_number_to_string(number: int) -> str:
+    """Round an int and convert to string"""
     return str(int(round(number)))
 
 
@@ -179,9 +180,9 @@ def get_weather():
     data = resp.json()
     print(data)
     temp = {
-        "Average": roundThenString(data["main"]["temp"]),
-        "High": roundThenString(data["main"]["temp_max"]),
-        "Low": roundThenString(data["main"]["temp_min"]),
+        "Average": round_number_to_string(data["main"]["temp"]),
+        "High": round_number_to_string(data["main"]["temp_max"]),
+        "Low": round_number_to_string(data["main"]["temp_min"]),
         "Weather": data["weather"][0]["main"],
     }
     return temp
