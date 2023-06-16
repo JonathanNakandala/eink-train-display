@@ -243,8 +243,8 @@ def main():
         # epd.Clear()
 
         # Create blank monochrome image to draw onto
-        Himage = Image.new("1", (epd.width, epd.height), 255)  # 255: clear the frame
-        draw = ImageDraw.Draw(Himage)
+        pil_image = Image.new("1", (epd.width, epd.height), 255)  # 255: clear the frame
+        draw = ImageDraw.Draw(pil_image)
         logging.info("Drawing the time")
         now = datetime.now()
         time_string = now.strftime("%H:%M")
@@ -287,11 +287,11 @@ def main():
             now,
             get_departures(4, stations["South"]["from"], stations["South"]["to"]),
         )
-        drawTemp(Himage, draw, month_start_position + length_month)
+        drawTemp(pil_image, draw, month_start_position + length_month)
 
         logging.info("Displaying image and saving preview.png")
-        Himage.save("preview.png")
-        epd.display(epd.getbuffer(Himage))
+        pil_image.save("preview.png")
+        epd.display(epd.getbuffer(pil_image))
         logging.info("Sending Display to Sleep")
         epd.sleep()
 
