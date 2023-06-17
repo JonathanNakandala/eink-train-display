@@ -16,6 +16,7 @@ svglib = "0.9.4"
 pydantic = "^1.10.9"
 structlog = "^23.1.0"
 httpx = "^0.24.1"
+playwright = "^1.35.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
@@ -29,7 +30,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pylint.MASTER]
-load-plugins = "pylint_pydantic"
+extension-pkg-allow-list = ["spidev", "RPI", "RPi.GPIO"]
 
 [tool.pylint.'MESSAGES CONTROL']
 extension-pkg-whitelist = "pydantic"
+load-plugins = "pylint_pydantic"
