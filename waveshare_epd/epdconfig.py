@@ -35,17 +35,6 @@ import sys
 import time
 import structlog
 import spidev
-from RPi import GPIO
-
-GPIO.output: callable
-GPIO.input: callable
-GPIO.setmode: callable
-GPIO.setup: callable
-GPIO.setwarnings: callable
-GPIO.cleanup: callable
-GPIO.BCM: callable
-GPIO.IN: callable
-GPIO.OUT: callable
 
 
 log = structlog.getLogger()
@@ -64,6 +53,17 @@ class RaspberryPi:
     PWR_PIN = 18
 
     def __init__(self):
+        from RPi import GPIO  # pylint: disable=C0415
+
+        GPIO.output: callable
+        GPIO.input: callable
+        GPIO.setmode: callable
+        GPIO.setup: callable
+        GPIO.setwarnings: callable
+        GPIO.cleanup: callable
+        GPIO.BCM: callable
+        GPIO.IN: callable
+        GPIO.OUT: callable
         self.GPIO = GPIO  # pylint: disable=C0103
         self.SPI = spidev.SpiDev()  # pylint: disable=C0103
 
@@ -91,7 +91,7 @@ class RaspberryPi:
         """
         self.SPI.writebytes(data)
 
-    def spi_writebyte2(self, data):
+    def spi_writebyte2(self, data: bytearray):
         """
         Writes data to SPI
         Accepts a bytearray directly
@@ -161,6 +161,9 @@ class Dummy:
         """Dummy"""
 
     def spi_writebyte(self, data):
+        """Dummy"""
+
+    def spi_writebyte2(self, data):
         """Dummy"""
 
     def module_init(self):

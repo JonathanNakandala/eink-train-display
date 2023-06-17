@@ -1,10 +1,13 @@
+"""
+Modified epd7in5 from waveshare
+"""
 # *****************************************************************************
 # * | File        :	  epd7in5.py
 # * | Author      :   Waveshare team
 # * | Function    :   Electronic paper driver
 # * | Info        :
 # *----------------
-# * | This version:   V4.0
+# * | This version:   V4.0-jon
 # * | Date        :   2019-06-20
 # # | Info        :   python demo
 # -----------------------------------------------------------------------------
@@ -28,11 +31,10 @@
 #
 
 
+import os
 import structlog
-
 from PIL import Image
 
-from . import epdconfig
 
 log = structlog.getLogger()
 # Display resolution
@@ -41,11 +43,25 @@ EPD_HEIGHT = 480
 
 
 class EPD:
+    """
+    E-ink paper display handling class
+    Supports running as dummy class when not on a raspberry pi
+    """
+
     def __init__(self):
-        self.reset_pin = epdconfig.RST_PIN
-        self.dc_pin = epdconfig.DC_PIN
-        self.busy_pin = epdconfig.BUSY_PIN
-        self.cs_pin = epdconfig.CS_PIN
+        if os.path.exists("/sys/bus/platform/drivers/gpiomem-bcm2835"):
+            from .epdconfig import RaspberryPi  # pylint: disable=C0415
+
+            self.epdconfig = RaspberryPi()
+        else:
+            from .epdconfig import Dummy  # pylint: disable=C0415
+
+            self.epdconfig = Dummy()
+
+        self.reset_pin = self.epdconfig.RST_PIN
+        self.dc_pin = self.epdconfig.DC_PIN
+        self.busy_pin = self.epdconfig.BUSY_PIN
+        self.cs_pin = self.epdconfig.CS_PIN
         self.width = EPD_WIDTH
         self.height = EPD_HEIGHT
 
@@ -54,7 +70,7 @@ class EPD:
 	0x6, 0x3F, 0x3F, 0x11, 0x24, 0x7, 0x17,
     ]
 
-    LUT_VCOM_7IN5_V2 = [	
+    LUT_VCOM_7IN5_V2 = [
         0x0,	0xF,	0xF,	0x0,	0x0,	0x1,
         0x0,	0xF,	0x1,	0xF,	0x1,	0x2,
         0x0,	0xF,	0xF,	0x0,	0x0,	0x1,
@@ -62,7 +78,7 @@ class EPD:
         0x0,	0x0,	0x0,	0x0,	0x0,	0x0,
         0x0,	0x0,	0x0,	0x0,	0x0,	0x0,
         0x0,	0x0,	0x0,	0x0,	0x0,	0x0,
-    ]	
+    ]
 
     LUT_WW_7IN5_V2 = [
         0x10,	0xF,	0xF,	0x0,	0x0,	0x1,
@@ -74,7 +90,7 @@ class EPD:
         0x0,	0x0,	0x0,	0x0,	0x0,	0x0,
     ]
 
-    LUT_BW_7IN5_V2 = [	
+    LUT_BW_7IN5_V2 = [
         0x10,	0xF,	0xF,	0x0,	0x0,	0x1,
         0x84,	0xF,	0x1,	0xF,	0x1,	0x2,
         0x20,	0xF,	0xF,	0x0,	0x0,	0x1,
@@ -105,32 +121,47 @@ class EPD:
     ]
 
     # fmt: on
-    # Hardware reset
     def reset(self):
-        epdconfig.digital_write(self.reset_pin, 1)
-        epdconfig.delay_ms(20)
-        epdconfig.digital_write(self.reset_pin, 0)
-        epdconfig.delay_ms(2)
-        epdconfig.digital_write(self.reset_pin, 1)
-        epdconfig.delay_ms(20)
+        """
+        Resets the e-paper display by cycling the reset pin.
+            - Sends HIGH to the pin
+            - Pauses for 20ms on HIGH
+            - Sends LOW to the pin
+            - Pauses for 2ms on LOW
+        """
+        self.epdconfig.digital_write(self.reset_pin, 1)
+        self.epdconfig.delay_ms(20)
+        self.epdconfig.digital_write(self.reset_pin, 0)
+        self.epdconfig.delay_ms(2)
+        self.epdconfig.digital_write(self.reset_pin, 1)
+        self.epdconfig.delay_ms(20)
 
     def send_command(self, command):
-        epdconfig.digital_write(self.dc_pin, 0)
-        epdconfig.digital_write(self.cs_pin, 0)
-        epdconfig.spi_writebyte([command])
-        epdconfig.digital_write(self.cs_pin, 1)
+        """
+        Sends a command to the e-paper display.
+        """
+        self.epdconfig.digital_write(self.dc_pin, 0)
+        self.epdconfig.digital_write(self.cs_pin, 0)
+        self.epdconfig.spi_writebyte([command])
+        self.epdconfig.digital_write(self.cs_pin, 1)
 
-    def send_data(self, data):
-        epdconfig.digital_write(self.dc_pin, 1)
-        epdconfig.digital_write(self.cs_pin, 0)
-        epdconfig.spi_writebyte([data])
-        epdconfig.digital_write(self.cs_pin, 1)
+    def send_data(self, data: int):
+        """
+        Sends data to the e-paper display.
+        """
+        self.epdconfig.digital_write(self.dc_pin, 1)
+        self.epdconfig.digital_write(self.cs_pin, 0)
+        self.epdconfig.spi_writebyte([data])
+        self.epdconfig.digital_write(self.cs_pin, 1)
 
-    def send_data2(self, data):
-        epdconfig.digital_write(self.dc_pin, 1)
-        epdconfig.digital_write(self.cs_pin, 0)
-        epdconfig.spi_writebyte2(data)
-        epdconfig.digital_write(self.cs_pin, 1)
+    def send_data2(self, data: bytearray | list[int]):
+        """
+        Sends data to the e-paper display using the spi_writebyte2 method.
+        """
+        self.epdconfig.digital_write(self.dc_pin, 1)
+        self.epdconfig.digital_write(self.cs_pin, 0)
+        self.epdconfig.spi_writebyte2(data)
+        self.epdconfig.digital_write(self.cs_pin, 1)
 
     def read_busy(self):
         """
@@ -145,11 +176,11 @@ class EPD:
         """
         log.debug("e-Paper display busy")
         self.send_command(0x71)
-        busy = epdconfig.digital_read(self.busy_pin)
+        busy = self.epdconfig.digital_read(self.busy_pin)
         while busy == 0:
             self.send_command(0x71)
-            busy = epdconfig.digital_read(self.busy_pin)
-        epdconfig.delay_ms(20)
+            busy = self.epdconfig.digital_read(self.busy_pin)
+        self.epdconfig.delay_ms(20)
         log.debug("e-Paper no longer busy")
 
     def set_lut(
@@ -178,8 +209,22 @@ class EPD:
             for count in lut:
                 self.send_data(count)
 
-    def init(self):
-        if epdconfig.module_init() != 0:
+    def init(self) -> int:
+        """
+        Initializes the e-paper display.
+
+        This function initializes the display by setting:
+         - power
+         - VCOM
+         - booster
+         - OSC
+         - panel and resolution settings.
+         - It also sets a look-up table for the display.
+
+        If the module initialization fails, it returns -1.
+        """
+
+        if self.epdconfig.module_init() != 0:
             return -1
         # EPD hardware init start
         self.reset()
@@ -216,7 +261,7 @@ class EPD:
         self.send_data(self.Voltage_Frame_7IN5_V2[0])  # 3C=50Hz, 3A=100HZ
 
         self.send_command(0x04)  # POWER ON
-        epdconfig.delay_ms(100)
+        self.epdconfig.delay_ms(100)
         self.read_busy()
 
         self.send_command(0x00)  # PANNEL SETTING
@@ -251,7 +296,6 @@ class EPD:
             self.LUT_WB_7IN5_V2,
             self.LUT_BB_7IN5_V2,
         )
-        # EPD hardware init end
         return 0
 
     def getbuffer(self, image: Image) -> bytearray:
@@ -298,30 +342,39 @@ class EPD:
         buf = bytearray(val ^ 0xFF for val in buf)
         return buf
 
-    def display(self, image):
+    def display(self, image: bytearray):
+        """
+        Sends an image to the e-paper display.
+        """
         self.send_command(0x13)
         self.send_data2(image)
 
         self.send_command(0x12)
-        epdconfig.delay_ms(100)
+        self.epdconfig.delay_ms(100)
         self.read_busy()
 
-    def Clear(self):
+    def clear(self):
+        """
+        Clears the e-paper display by setting all pixels to white
+        """
         buf = [0x00] * (int(self.width / 8) * self.height)
         self.send_command(0x10)
         self.send_data2(buf)
         self.send_command(0x13)
         self.send_data2(buf)
         self.send_command(0x12)
-        epdconfig.delay_ms(100)
+        self.epdconfig.delay_ms(100)
         self.read_busy()
 
     def sleep(self):
+        """
+        Sets the e-paper display to powering off and entering deep sleep
+        """
         self.send_command(0x02)  # POWER_OFF
         self.read_busy()
 
         self.send_command(0x07)  # DEEP_SLEEP
         self.send_data(0xA5)
 
-        epdconfig.delay_ms(2000)
-        epdconfig.module_exit()
+        self.epdconfig.delay_ms(2000)
+        self.epdconfig.module_exit()
