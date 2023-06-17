@@ -4,10 +4,8 @@ Server to receive and display an image
 
 """
 import structlog
-
-from fastapi import FastAPI, Request, Depends
 import uvicorn
-
+from fastapi import FastAPI, Request, Depends, BackgroundTasks
 from waveshare_epd import epd7in5_V2
 
 log = structlog.get_logger()
@@ -23,8 +21,23 @@ async def parse_body(request: Request):
     return data
 
 
+def display_on_epd(data: bytes):
+    """
+    Send the bytes to the display
+    """
+    epd = epd7in5_V2.EPD()
+    log.info("Initializing the display...")
+    epd.init()
+    epd.display(data)
+    log.info("Sending display to sleep")
+    epd.sleep()
+
+
 @app.post("/upload")
-async def upload_file(data: bytes = Depends(parse_body)):
+async def upload_file(
+    background_tasks: BackgroundTasks,
+    data: bytes = Depends(parse_body),
+):
     """
     Send Data
     """
@@ -32,13 +45,14 @@ async def upload_file(data: bytes = Depends(parse_body)):
 
     file_size = len(byte_data)
     log.info(f"Received file size: {file_size} bytes", type=type(data), data=data)
-    epd = epd7in5_V2.EPD()
-    log.info("Initialising the display...")
-    epd.init()
-    epd.display(data)
-    log.info("Sending Display to Sleep")
-    epd.sleep()
-    return {"message": "Bytearray received and processed successfully!"}
+
+    # Add the display operation as a background task
+    background_tasks.add_task(display_on_epd, data)
+
+    return {
+        "message": "Data received and processing started",
+        "file_size": file_size,
+    }
 
 
 if __name__ == "__main__":
