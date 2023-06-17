@@ -29,6 +29,9 @@
 
 
 import structlog
+
+from PIL import Image
+
 from . import epdconfig
 
 log = structlog.getLogger()
@@ -236,29 +239,48 @@ class EPD:
         # EPD hardware init end
         return 0
 
-    def getbuffer(self, image):
-        img = image
-        imwidth, imheight = img.size
+    def getbuffer(self, image: Image) -> bytearray:
+        """
+        Processes PIL Image and returns a bytearray that represents the image data
+        The image is converted to monochrome and rotated if necessary
+        If dimensions are incorrect, a warning is logged and a blank buffer is returned
+
+        Args:
+            image (PIL.Image.Image): The image to process. It should match the width and
+            height expected by the display.
+
+        Returns:
+            bytearray: A bytearray representing the image data. In this array, 0
+            represents white and 1 represents black, following the e-paper display convention.
+            If the input image does not have the correct dimensions, a blank buffer is returned.
+
+        Raises:
+            If the input is not a valid PIL Image, a TypeError may be raised
+            when the function tries to access the `size` attribute or
+            call the `convert` or `rotate` methods.
+        """
+        imwidth, imheight = image.size
         if imwidth == self.width and imheight == self.height:
-            img = img.convert("1")
+            image = image.convert("1")
         elif imwidth == self.height and imheight == self.width:
             # image has correct dimensions, but needs to be rotated
-            img = img.rotate(90, expand=True).convert("1")
+            image = image.rotate(90, expand=True).convert("1")
         else:
             log.warning(
-                "Wrong image dimensions: must be "
-                + str(self.width)
-                + "x"
-                + str(self.height)
+                "Incorrect image dimensions, returning blank buffer",
+                expected_x=self.width,
+                expected_y=self.height,
+                actual_x=imwidth,
+                actual_y=imheight,
             )
             # return a blank buffer
             return [0x00] * (int(self.width / 8) * self.height)
 
-        buf = bytearray(img.tobytes("raw"))
+        buf = bytearray(image.tobytes("raw"))
         # The bytes need to be inverted, because in the PIL world 0=black and 1=white, but
         # in the e-paper world 0=white and 1=black.
-        for i in range(len(buf)):
-            buf[i] ^= 0xFF
+        for i, val in enumerate(buf):
+            buf[i] = val ^ 0xFF
         return buf
 
     def display(self, image):
