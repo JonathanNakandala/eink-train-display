@@ -44,7 +44,7 @@ async def upload_file(
     byte_data = data
 
     file_size = len(byte_data)
-    log.info(f"Received file size: {file_size} bytes", type=type(data), data=data)
+    log.info(f"Received file size: {file_size} bytes", type=type(data))
 
     # Add the display operation as a background task
     background_tasks.add_task(display_on_epd, data)
