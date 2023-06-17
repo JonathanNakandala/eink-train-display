@@ -30,15 +30,13 @@ def draw_departure_issues(draw, y_position, departures):
         _description_
     """
     #
-    try:
+    if departures.nrccMessages is not None:
         message = departures.nrccMessages.message[0]._value_1  # pylint: disable=W0212
-    except KeyError:
-        log.error("Failed to get error message")
-        return
-    # The message is long with a link to their website, so split it at the .
-    message = message.split(".", 1)[0]
+        # The message is long with a link to their website, so split it at the .
+        message = message.split(".", 1)[0]
+    else:
+        message = "No scheduled trains"
     lines = textwrap.wrap(message, width=50)
-    print(message)
     # draw.text((train_columns[0], y), message,  font = font_traininfo, fill = 0)
     y_text = y_position
     for line in lines:
@@ -86,8 +84,8 @@ def draw_departures(draw: ImageDraw, y_position, time_now: datetime, departures)
     """
     try:
         services = departures.trainServices.service
-    except KeyError:
-        log.error("Failed to read trains")
+    except (KeyError, AttributeError):
+        log.error("Failed to read trains", data=departures)
         draw_departure_issues(draw, y_position, departures)
         return
 
