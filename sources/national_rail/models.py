@@ -90,6 +90,6 @@ class DeparturesResponse(BaseModel):
     nrccMessages: Optional[str]
     platformAvailable: bool
     areServicesAvailable: Optional[bool]
-    trainServices: TrainServices
+    trainServices: TrainServices | None
     busServices: Optional[str]
     ferryServices: Optional[str]

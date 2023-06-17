@@ -1,6 +1,7 @@
 """
 National Rail SOAP API
 """
+from pydantic import ValidationError
 import structlog
 
 from zeep import Client, xsd
@@ -61,7 +62,11 @@ class NationalRail:
                 filterCrs=to_station,
                 _soapheaders=[self.header_value],
             )
-            return DeparturesResponse(**serialize_object(response))
+            try:
+                return DeparturesResponse(**serialize_object(response))
+            except ValidationError as model_error:
+                log.error("Failed Valdation", response=response)
+                raise model_error
         except Fault as error:
             log.error(
                 "Error getting departure information from National Rail",
