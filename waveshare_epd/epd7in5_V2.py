@@ -132,15 +132,25 @@ class EPD:
         epdconfig.spi_writebyte2(data)
         epdconfig.digital_write(self.cs_pin, 1)
 
-    def ReadBusy(self):
-        log.debug("e-Paper busy")
+    def read_busy(self):
+        """
+        Check the status of the e-Paper display and wait if it is busy.
+
+        This method repeatedly sends the "read status" command (0x71) to the display
+        and reads the BUSY_PIN to check if the display is busy.
+        Once the display is not busy, adds a delay of 20 milliseconds
+        to ensure the display is ready for the next operation.
+
+        Note: This method will block the execution of the program
+        """
+        log.debug("e-Paper display busy")
         self.send_command(0x71)
         busy = epdconfig.digital_read(self.busy_pin)
         while busy == 0:
             self.send_command(0x71)
             busy = epdconfig.digital_read(self.busy_pin)
         epdconfig.delay_ms(20)
-        log.debug("e-Paper busy release")
+        log.debug("e-Paper no longer busy")
 
     def set_lut(
         self,
@@ -207,7 +217,7 @@ class EPD:
 
         self.send_command(0x04)  # POWER ON
         epdconfig.delay_ms(100)
-        self.ReadBusy()
+        self.read_busy()
 
         self.send_command(0x00)  # PANNEL SETTING
         self.send_data(0x3F)  # KW-3f KWR-2F BWROTP-0f BWOTP-1f
@@ -294,7 +304,7 @@ class EPD:
 
         self.send_command(0x12)
         epdconfig.delay_ms(100)
-        self.ReadBusy()
+        self.read_busy()
 
     def Clear(self):
         buf = [0x00] * (int(self.width / 8) * self.height)
@@ -304,11 +314,11 @@ class EPD:
         self.send_data2(buf)
         self.send_command(0x12)
         epdconfig.delay_ms(100)
-        self.ReadBusy()
+        self.read_busy()
 
     def sleep(self):
         self.send_command(0x02)  # POWER_OFF
-        self.ReadBusy()
+        self.read_busy()
 
         self.send_command(0x07)  # DEEP_SLEEP
         self.send_data(0xA5)
