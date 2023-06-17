@@ -276,11 +276,11 @@ class EPD:
             # return a blank buffer
             return [0x00] * (int(self.width / 8) * self.height)
 
-        buf = bytearray(image.tobytes("raw"))
-        # The bytes need to be inverted, because in the PIL world 0=black and 1=white, but
-        # in the e-paper world 0=white and 1=black.
-        for i, val in enumerate(buf):
-            buf[i] = val ^ 0xFF
+        buf = bytearray(image)
+        # The bytes need to be inverted,
+        # PIL Image:   1=white and 0=black
+        # e-paper  :   0=white and 1=black
+        buf = bytearray(val ^ 0xFF for val in buf)
         return buf
 
     def display(self, image):
