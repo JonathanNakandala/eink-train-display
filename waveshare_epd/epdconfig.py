@@ -34,6 +34,19 @@ import os
 import sys
 import time
 import structlog
+import spidev
+from RPi import GPIO
+
+GPIO.output: callable
+GPIO.input: callable
+GPIO.setmode: callable
+GPIO.setup: callable
+GPIO.setwarnings: callable
+GPIO.cleanup: callable
+GPIO.BCM: callable
+GPIO.IN: callable
+GPIO.OUT: callable
+
 
 log = structlog.getLogger()
 
@@ -51,25 +64,38 @@ class RaspberryPi:
     PWR_PIN = 18
 
     def __init__(self):
-        import spidev
-        import RPi.GPIO
+        self.GPIO = GPIO  # pylint: disable=C0103
+        self.SPI = spidev.SpiDev()  # pylint: disable=C0103
 
-        self.GPIO = RPi.GPIO
-        self.SPI = spidev.SpiDev()
-
-    def digital_write(self, pin, value):
+    def digital_write(self, pin: int, value: int):
+        """
+        Write value to GPIO Pin
+        """
         self.GPIO.output(pin, value)
 
-    def digital_read(self, pin):
+    def digital_read(self, pin: int) -> int:
+        """
+        Read Value from GPIO pin
+        """
         return self.GPIO.input(pin)
 
-    def delay_ms(self, delaytime):
+    def delay_ms(self, delaytime: int):
+        """
+        Sleep for set amount of milliseconds
+        """
         time.sleep(delaytime / 1000.0)
 
-    def spi_writebyte(self, data):
+    def spi_writebyte(self, data: bytes):
+        """
+        Write a list of values to SPI device
+        """
         self.SPI.writebytes(data)
 
     def spi_writebyte2(self, data):
+        """
+        Writes data to SPI
+        Accepts a bytearray directly
+        """
         self.SPI.writebytes2(data)
 
     def module_init(self):
