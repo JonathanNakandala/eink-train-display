@@ -76,6 +76,22 @@ class TrainServices(BaseModel):
     service: List[Service]
 
 
+class Message(BaseModel):
+    """
+    The container of the actual message
+    """
+
+    _value_1: str
+
+
+class NrccMessages(BaseModel):
+    """
+    Fields inside nrccMessages
+    """
+
+    message: List[Message]
+
+
 class DeparturesResponse(BaseModel):
     """
     Model for GetDepartureBoard
@@ -87,7 +103,7 @@ class DeparturesResponse(BaseModel):
     filterLocationName: str
     filtercrs: str
     filterType: Optional[str]
-    nrccMessages: Optional[str]
+    nrccMessages: NrccMessages | None
     platformAvailable: bool
     areServicesAvailable: Optional[bool]
     trainServices: TrainServices | None
