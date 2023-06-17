@@ -276,7 +276,7 @@ class EPD:
             # return a blank buffer
             return [0x00] * (int(self.width / 8) * self.height)
 
-        buf = bytearray(image)
+        buf = bytearray(image.tobytes("raw"))
         # The bytes need to be inverted,
         # PIL Image:   1=white and 0=black
         # e-paper  :   0=white and 1=black
