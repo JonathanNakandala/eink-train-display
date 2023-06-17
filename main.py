@@ -10,6 +10,9 @@ from PIL import Image
 import uvicorn
 from pydantic import BaseModel
 from fastapi import Depends, FastAPI, BackgroundTasks, HTTPException
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.base import JobLookupError
+
 
 from sources import NationalRail, Weather
 from render import Pillow
@@ -26,6 +29,8 @@ app = FastAPI()
 dashboard_update_interval = datetime.timedelta(minutes=5)
 dashboard_update_enabled_hours = (6, 24)  # Update enabled between 6 AM and 11 PM
 
+scheduler = BackgroundScheduler()
+
 
 class APIConfig:
     """
@@ -34,11 +39,29 @@ class APIConfig:
 
     _instance = None
     update_interval: datetime.timedelta = datetime.timedelta(minutes=5)
+    job = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(APIConfig, cls).__new__(cls)
         return cls._instance
+
+    def set_job(self, job):
+        """
+        Sets the job scheduled in the BackgroundScheduler.
+        """
+        log.info("Setting Job", job=job)
+        self.job = job
+
+    def reschedule(self, interval):
+        """
+        Reschedules the job with a new interval.
+        """
+        try:
+            log.info("Rescheduling job interval", minutes=interval)
+            self.job.reschedule("interval", minutes=interval)
+        except JobLookupError:
+            log.warn("Job not found")
 
 
 def get_apiconfig():
@@ -170,7 +193,11 @@ async def update_config(
 def main():
     """Program Entrypoint"""
     try:
-        run_dashboard_update()  # Run the dashboard update initially
+        # run_dashboard_update()  # Run the dashboard update initially
+        api_config = APIConfig()
+        job = scheduler.add_job(run_dashboard_update, "interval", minutes=5)
+        api_config.set_job(job)
+        scheduler.start()
 
         uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
 
