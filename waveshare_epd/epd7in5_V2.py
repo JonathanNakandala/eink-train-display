@@ -142,26 +142,31 @@ class EPD:
         epdconfig.delay_ms(20)
         log.debug("e-Paper busy release")
 
-    def SetLut(self, lut_vcom, lut_ww, lut_bw, lut_wb, lut_bb):
-        self.send_command(0x20)
-        for count in range(0, 42):
-            self.send_data(lut_vcom[count])
+    def set_lut(
+        self,
+        lut_vcom: list[int],
+        lut_ww: list[int],
+        lut_bw: list[int],
+        lut_wb: list[int],
+        lut_bb: list[int],
+    ) -> None:
+        """
+        Set the lookup tables (LUT) for voltage levels of the e-ink display.
 
-        self.send_command(0x21)
-        for count in range(0, 42):
-            self.send_data(lut_ww[count])
+        This method configures the display's voltages for the common electrode (VCOM)
+        and for the different transitions operations:
+            white-to-white (WW)
+            black-to-white (BW)
+            white-to-black (WB)
+            black-to-black (BB)
+        """
+        command_list = [0x20, 0x21, 0x22, 0x23, 0x24]
+        lut_list = [lut_vcom, lut_ww, lut_bw, lut_wb, lut_bb]
 
-        self.send_command(0x22)
-        for count in range(0, 42):
-            self.send_data(lut_bw[count])
-
-        self.send_command(0x23)
-        for count in range(0, 42):
-            self.send_data(lut_wb[count])
-
-        self.send_command(0x24)
-        for count in range(0, 42):
-            self.send_data(lut_bb[count])
+        for command, lut in zip(command_list, lut_list):
+            self.send_command(command)
+            for count in lut:
+                self.send_data(count)
 
     def init(self):
         if epdconfig.module_init() != 0:
@@ -229,7 +234,7 @@ class EPD:
         self.send_data(0x00)
         self.send_data(0x00)
 
-        self.SetLut(
+        self.set_lut(
             self.LUT_VCOM_7IN5_V2,
             self.LUT_WW_7IN5_V2,
             self.LUT_BW_7IN5_V2,
