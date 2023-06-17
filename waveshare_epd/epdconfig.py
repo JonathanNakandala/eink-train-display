@@ -73,6 +73,10 @@ class RaspberryPi:
         self.SPI.writebytes2(data)
 
     def module_init(self):
+        """
+        This function sets up the GPIO, turns on the power,
+        and opens an SPI interface for communication with the display.
+        """
         self.GPIO.setmode(self.GPIO.BCM)
         self.GPIO.setwarnings(False)
         self.GPIO.setup(self.RST_PIN, self.GPIO.OUT)
@@ -90,17 +94,25 @@ class RaspberryPi:
         return 0
 
     def module_exit(self):
-        log.debug("spi end")
+        """
+        Shut down the SPI interface, turns off the power to the display, and cleans up the GPIO.
+        Note: After calling this function, display needs to be initialized again.
+        """
+        log.debug("Ending SPI connection.")
         self.SPI.close()
 
-        log.debug("close 5V, Module enters 0 power consumption ...")
+        log.debug(
+            "Shutting down power to the display. Entering zero power consumption mode..."
+        )
         self.GPIO.output(self.RST_PIN, 0)
         self.GPIO.output(self.DC_PIN, 0)
         self.GPIO.output(self.PWR_PIN, 0)
 
+        log.debug("Cleaning up GPIO.")
         self.GPIO.cleanup(
             [self.RST_PIN, self.DC_PIN, self.CS_PIN, self.BUSY_PIN, self.PWR_PIN]
         )
+        log.info("Display Powered Down")
 
 
 class Dummy:
