@@ -8,7 +8,8 @@ It runs on a Raspberry Pi
 
 ## Requirements
 
-Python 3
+- Python 3.10
+- poetry
 
 
 ```
@@ -51,13 +52,20 @@ source env/bin/activate
 ### Install requirements
 
 ```
-pip install -r requirements.txt
+poetry install
 ```
 
-### Start the script
+### Starting
+#### Start the API Server
 
 ```
-python main.py
+python api.main
+```
+
+#### Start the display server
+
+```
+python server.py
 ```
 
 
