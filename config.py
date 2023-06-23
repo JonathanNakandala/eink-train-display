@@ -35,6 +35,14 @@ class Weather(BaseSettings):
     townid: int
 
 
+class Endpoints(BaseSettings):
+    """
+    Openweathermap town
+    """
+
+    display_server: str
+
+
 class Config(BaseSettings):
     """
     Application Configuration Class
@@ -43,6 +51,7 @@ class Config(BaseSettings):
     tokens: Tokens
     stations: Stations
     weather: Weather
+    endpoints: Endpoints
 
 
 def load_config() -> Config:
@@ -59,6 +68,7 @@ def load_config() -> Config:
         "tokens": dict(config["tokens"]),
         "stations": dict(config["stations"]),
         "weather": {k: int(v) for k, v in config["weather"].items()},
+        "endpoints": dict(config["endpoints"]),
     }
 
     return Config(**config_dict)
