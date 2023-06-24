@@ -2,11 +2,14 @@
 Scheduler Operations
 """
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
+from api.dashboard_data import DashboardInputData, RailwayInformation
 from api.dependencies import APIConfig, get_apiconfig
+
+from sources import NationalRail, Weather
 
 router = APIRouter()
 
@@ -48,3 +51,34 @@ async def update_config(
         "current_interval": current_interval,
         "new_interval": new_config.interval_minutes,
     }
+
+
+@router.get("/get_dashboard_data", response_model=DashboardInputData)
+async def get_dashboard_data(
+    api_config: APIConfig = Depends(get_apiconfig),
+):
+    """
+    Convert DeparturesResponse to DashboardData's NationalRail object.
+    """
+    client = Weather.OpenWeather(token=APIConfig().config.tokens.open_weather_map)
+    weather = client.get_weather(APIConfig().config.weather.townid, "metric")
+    rail_client = NationalRail.NationalRail(api_config.config.tokens.national_rail)
+    northbound_trains = rail_client.get_departures(
+        4,
+        api_config.config.stations.northbound_from,
+        api_config.config.stations.northbound_to,
+    )
+    southbound_trains = rail_client.get_departures(
+        4,
+        api_config.config.stations.southbound_from,
+        api_config.config.stations.southbound_to,
+    )
+
+    dashboard_data = DashboardInputData(
+        time=datetime.now(),
+        rail=RailwayInformation(
+            northbound=northbound_trains, southbound=southbound_trains
+        ),
+        weather=weather,
+    )
+    return dashboard_data
