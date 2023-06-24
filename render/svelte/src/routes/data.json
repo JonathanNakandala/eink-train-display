@@ -1,0 +1,450 @@
+{
+    "rail": {
+        "northbound": {
+            "generatedAt": "2023-06-24T12:05:15.981855+01:00",
+            "locationName": "Hornsey",
+            "crs": "HRN",
+            "filterLocationName": "Winchmore Hill",
+            "filtercrs": "WIH",
+            "filterType": null,
+            "nrccMessages": null,
+            "platformAvailable": true,
+            "areServicesAvailable": null,
+            "trainServices": {
+                "service": [
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "12:31",
+                        "etd": "On time",
+                        "platform": "2",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4692723HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN161000",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Hertford North",
+                                    "crs": "HFN",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    },
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "13:01",
+                        "etd": "On time",
+                        "platform": "2",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4692729HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN161200",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Hertford North",
+                                    "crs": "HFN",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    },
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "13:31",
+                        "etd": "On time",
+                        "platform": "2",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4692737HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN161400",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Hertford North",
+                                    "crs": "HFN",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    },
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "14:01",
+                        "etd": "On time",
+                        "platform": "2",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4692743HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN161600",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Hertford North",
+                                    "crs": "HFN",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    }
+                ]
+            },
+            "busServices": null,
+            "ferryServices": null
+        },
+        "southbound": {
+            "generatedAt": "2023-06-24T12:05:16.002552+01:00",
+            "locationName": "Hornsey",
+            "crs": "HRN",
+            "filterLocationName": "Finsbury Park",
+            "filtercrs": "FPK",
+            "filterType": null,
+            "nrccMessages": null,
+            "platformAvailable": true,
+            "areServicesAvailable": null,
+            "trainServices": {
+                "service": [
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "12:16",
+                        "etd": "On time",
+                        "platform": "1",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4692733HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN161300",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Hertford North",
+                                    "crs": "HFN",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    },
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "12:31",
+                        "etd": "On time",
+                        "platform": "1",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4700519HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN211400",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Potters Bar",
+                                    "crs": "PBR",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    },
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "12:46",
+                        "etd": "On time",
+                        "platform": "1",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4692740HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN161500",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Hertford North",
+                                    "crs": "HFN",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    },
+                    {
+                        "sta": null,
+                        "eta": null,
+                        "std": "13:01",
+                        "etd": "On time",
+                        "platform": "1",
+                        "operator": "Great Northern",
+                        "operatorCode": "GN",
+                        "isCircularRoute": null,
+                        "isCancelled": null,
+                        "filterLocationCancelled": null,
+                        "serviceType": "train",
+                        "length": null,
+                        "detachFront": null,
+                        "isReverseFormation": null,
+                        "cancelReason": null,
+                        "delayReason": null,
+                        "serviceID": "4700523HRNSY___",
+                        "adhocAlerts": null,
+                        "rsid": "GN211600",
+                        "origin": {
+                            "location": [
+                                {
+                                    "locationName": "Potters Bar",
+                                    "crs": "PBR",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "location": [
+                                {
+                                    "locationName": "Moorgate",
+                                    "crs": "MOG",
+                                    "via": null,
+                                    "futureChangeTo": null,
+                                    "assocIsCancelled": null
+                                }
+                            ]
+                        },
+                        "currentOrigins": null,
+                        "currentDestinations": null,
+                        "formation": null
+                    }
+                ]
+            },
+            "busServices": null,
+            "ferryServices": null
+        }
+    },
+    "weather": {
+        "coord": {
+            "lon": -0.1237,
+            "lat": 51.5797
+        },
+        "weather": [
+            {
+                "id": 801,
+                "main": "Clouds",
+                "description": "few clouds",
+                "icon": "02d"
+            }
+        ],
+        "base": "stations",
+        "main": {
+            "temp": 25.52,
+            "feels_like": 25.64,
+            "temp_min": 23.86,
+            "temp_max": 26.66,
+            "pressure": 1015,
+            "humidity": 58
+        },
+        "visibility": 10000,
+        "wind": {
+            "speed": 3.6,
+            "deg": 250
+        },
+        "clouds": {
+            "all": 20
+        },
+        "dt": "2023-06-24T12:04:25",
+        "sys": {
+            "type": 2,
+            "id": 2075535,
+            "country": "GB",
+            "sunrise": "2023-06-24T04:43:22",
+            "sunset": "2023-06-24T21:22:11"
+        },
+        "timezone": 3600,
+        "id": 6690565,
+        "name": "Crouch End",
+        "cod": 200
+    },
+    "time": "2023-06-24T12:05:19.535804"
+}

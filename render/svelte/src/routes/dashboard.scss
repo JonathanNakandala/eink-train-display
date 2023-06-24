@@ -1,0 +1,118 @@
+.container {
+	display: grid;
+	grid-template-columns: 3fr 1fr;
+	grid-template-rows: 1fr 1fr 2fr;
+	grid-template-areas: 'time-date time-date' 'northbound weather' 'southbound weather';
+	width: 100vw;
+	height: 100vh;
+	font-family: 'Overpass', sans-serif;
+
+
+	.time-date {
+		grid-area: time-date;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		grid-column: span 2;
+
+		.time {
+			font-size: 5vw;
+			font-weight: 300;
+			text-align: left;
+		}
+
+		.date {
+			display: flex;
+			align-items: baseline;
+
+			.day {
+				font-size: 4vw;
+				font-weight: 600;
+				margin-right: 0;
+			}
+
+			.date-num {
+				font-size: 4vw;
+				font-weight: 300;
+			}
+		}
+	}
+
+	.table {
+		width: 100%;
+		margin-bottom: 2%;
+		border-collapse: collapse;
+
+		tr {
+			height: 25px;
+		}
+
+		th,
+		td {
+			text-align: left;
+			padding: 0;
+			font-size: 1.25em;
+			font-weight: 300;
+		}
+
+		th {
+			font-weight: 600;
+			text-align: left;
+			font-size: 1.5em;
+		}
+	}
+
+	.northbound {
+		@extend .table;
+		grid-area: northbound;
+	}
+
+	.southbound {
+		@extend .table;
+		grid-area: southbound;
+		height: 25px;
+	}
+
+	%temperatures {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 100%;
+
+		.current {
+			font-size: 4em;
+			font-weight: 300;
+			align-self: center;
+			padding-right: 10%;
+		}
+
+		.min-max {
+			display: flex;
+			flex-direction: column;
+			font-size: 2em;
+			font-weight: 300;
+			height: 100%;
+			justify-content: center;
+		}
+	}
+
+	.weather {
+		grid-area: weather;
+		display: grid;
+		grid-template-rows: 1fr 1fr;
+
+		.weather-icon {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-image: url('./weather_icons/051-cloud-3.svg');
+			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
+		}
+
+		.temperatures {
+			@extend %temperatures;
+		}
+	}
+}
