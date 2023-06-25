@@ -100,6 +100,7 @@
 		grid-area: weather;
 		display: grid;
 		grid-template-rows: 1fr 1fr;
+		height: 10vh;
 
 		.weather-icon {
 			display: flex;
@@ -113,6 +114,28 @@
 
 		.temperatures {
 			@extend %temperatures;
+		}
+
+		.additional-info {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+
+			.description {
+				font-size: 1.5em;
+				/* Adjust font size as needed */
+				font-weight: 300;
+				margin-bottom: 0.5em;
+				/* Adjust spacing as needed */
+			}
+
+			.AQI {
+				font-size: 1.5em;
+				/* Adjust font size as needed */
+				font-weight: 300;
+			}
 		}
 	}
 }

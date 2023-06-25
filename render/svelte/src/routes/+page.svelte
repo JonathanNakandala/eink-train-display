@@ -2,7 +2,7 @@
 	export const prerender = true;
 	import { onMount } from 'svelte';
 	import './dashboard.scss';
-	import type { DashboardInputData, Service } from './models';
+	import type { DashboardInputData, Service, AirconData } from './models';
 	import exampleData from './data.json';
 
 	interface Train {
@@ -16,6 +16,9 @@
 		southboundTrains: Train[] = [];
 	let currentTemperature: string, minTemperature: string, maxTemperature: string;
 	let weatherDescription: string;
+	let airconData: AirconData[] = [];
+
+	let airQualityIndex: number;
 	const loadData = (data: DashboardInputData) => {
 		const parsedTime = new Date(data.time);
 
@@ -45,6 +48,8 @@
 		minTemperature = `${Math.round(data.weather.main.temp_min)}°C`;
 		maxTemperature = `${Math.round(data.weather.main.temp_max)}°C`;
 		weatherDescription = data.weather.weather[0].description;
+		airQualityIndex = data.air_quality.list[0].main.aqi;
+		airconData = data.aircon;
 	};
 
 	const loadDataFromSource = (path: string) => {
@@ -134,12 +139,27 @@
 	</table>
 
 	<div class="weather">
-		<div class="weather-icon" />
 		<div class="temperatures">
 			<div class="current">{currentTemperature}</div>
 			<div class="min-max">
 				<div>{maxTemperature}</div>
 				<div>{minTemperature}</div>
+			</div>
+		</div>
+		<div class="additional-info">
+			<div class="description">{weatherDescription}</div>
+			<div class="AQI">AQI: {airQualityIndex}</div>
+			<div class="aircon">
+				{#each airconData as unit}
+					<div>
+						{unit.name}: {unit.temperature.indoor}C {unit.humidity}%
+					</div>
+				{/each}
+				{#if airconData.length > 0}
+					<div>
+						Outdoor: {airconData[0].temperature.outdoor}C
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

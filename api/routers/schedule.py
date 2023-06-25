@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from api.dashboard_data import DashboardInputData, RailwayInformation
 from api.dependencies import APIConfig, get_apiconfig
 
-from sources import NationalRail, Weather
+from sources import NationalRail, Weather, Daikin
 
 router = APIRouter()
 
@@ -62,6 +62,7 @@ async def get_dashboard_data(
     """
     client = Weather.OpenWeather(token=APIConfig().config.tokens.open_weather_map)
     weather = client.get_weather(APIConfig().config.weather.townid, "metric")
+    air_quality = client.get_air_quality(lat=weather.coord.lat, lon=weather.coord.lon)
     rail_client = NationalRail.NationalRail(api_config.config.tokens.national_rail)
     northbound_trains = rail_client.get_departures(
         4,
@@ -74,11 +75,18 @@ async def get_dashboard_data(
         api_config.config.stations.southbound_to,
     )
 
+    aircon_data = []
+    for aircon in api_config.config.aircon.endpoints:
+        aircon_data.append(Daikin.DaikinClient(aircon).get_daikin_info())
+
     dashboard_data = DashboardInputData(
         time=datetime.now(),
         rail=RailwayInformation(
             northbound=northbound_trains, southbound=southbound_trains
         ),
         weather=weather,
+        air_quality=air_quality,
+        aircon=aircon_data,
     )
+
     return dashboard_data
