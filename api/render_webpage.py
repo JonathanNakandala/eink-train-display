@@ -28,7 +28,8 @@ def render_webpage() -> Image:
             / "build"
             / "index.html"
         ).resolve()
-        page.on("console", log.info(log))
+        log.info(f"Loading Webpage: {file_path}")
+        page.on("console", lambda msg: log.info(msg.text))
         page.goto(f"file://{file_path}")
 
         def check_class_loaded():
@@ -39,7 +40,6 @@ def render_webpage() -> Image:
             )
 
         while not check_class_loaded():
-            # You could add a delay here if needed
             pass
 
         page.screenshot(path="playwright-screenshot.png")
