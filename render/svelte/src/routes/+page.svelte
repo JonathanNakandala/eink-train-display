@@ -1,5 +1,4 @@
 <script lang="ts">
-	export const prerender = true;
 	import { onMount } from 'svelte';
 	import './dashboard.scss';
 	import type { DashboardInputData, Service, AirconData } from './models';
@@ -51,12 +50,13 @@
 		airQualityIndex = data.air_quality.list[0].main.aqi;
 		airconData = data.aircon;
 	};
-
+	let loaded = false;
 	const loadDataFromSource = (path: string) => {
 		fetch(path)
 			.then((response) => response.json() as Promise<DashboardInputData>)
 			.then((data) => {
 				loadData(data);
+				loaded = true;
 			})
 			.catch((error) => console.error('Error:', error));
 	};
@@ -93,7 +93,7 @@
 	});
 </script>
 
-<div class="container">
+<div class="container" class:loaded>
 	<div class="time-date">
 		<div class="time">{currentTime}</div>
 		<div class="date">
@@ -109,14 +109,20 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each northboundTrains as train}
+			{#if northboundTrains.length === 0}
 				<tr>
-					<td>{train.time}</td>
-					<td>{train.destination}</td>
-					<td>{train.status}</td>
-					<td>{train.delay}</td>
+					<td colspan="4">No scheduled trains</td>
 				</tr>
-			{/each}
+			{:else}
+				{#each northboundTrains as train}
+					<tr>
+						<td>{train.time}</td>
+						<td>{train.destination}</td>
+						<td>{train.status}</td>
+						<td>{train.delay}</td>
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
 	</table>
 
@@ -127,14 +133,20 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each southboundTrains as train}
+			{#if southboundTrains.length === 0}
 				<tr>
-					<td>{train.time}</td>
-					<td>{train.destination}</td>
-					<td>{train.status}</td>
-					<td>{train.delay}</td>
+					<td colspan="4">No scheduled trains</td>
 				</tr>
-			{/each}
+			{:else}
+				{#each southboundTrains as train}
+					<tr>
+						<td>{train.time}</td>
+						<td>{train.destination}</td>
+						<td>{train.status}</td>
+						<td>{train.delay}</td>
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
 	</table>
 

@@ -14,6 +14,7 @@ import uvicorn
 from .log_setup import setup_logging
 
 from .utils import run_dashboard_update
+from .render_webpage import render_webpage
 from .routers import schedule
 from .dependencies import Scheduler, get_apiconfig
 
@@ -28,9 +29,9 @@ async def lifespan(fast_app: FastAPI):
     api_config = get_apiconfig()
     fast_app.state.scheduler = Scheduler()
     fast_app.state.scheduler.scheduler.add_job(
-        run_dashboard_update,
+        render_webpage,
         "interval",
-        args=[api_config],
+        args=[],
         seconds=5 * 60,  # 5 minutes
         next_run_time=datetime.datetime.now(),
     )
