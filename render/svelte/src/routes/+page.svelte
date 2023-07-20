@@ -80,7 +80,7 @@
 		}
 	}
 
-	const useAPI = false; // Set this to true or false to choose between API and file loading
+	const useAPI = true; // Set this to true or false to choose between API and file loading
 
 	onMount(async function () {
 		if (useAPI) {
