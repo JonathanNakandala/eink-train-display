@@ -17,7 +17,7 @@ services:
       context: ./render/svelte
       dockerfile: Dockerfile
       args:
-        VITE_USE_API: "True"
+        VITE_USE_API: "true"
         VITE_DASHBOARD_URL: "http://api:8000/get_dashboard_data"
     ports:
       - 8927:8927
