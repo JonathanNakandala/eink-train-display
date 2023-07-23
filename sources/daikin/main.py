@@ -1,9 +1,10 @@
 """
-Example usage of daikinapi module
+Daikin APi module
 
 use e.g. with "python example.py 192.168.1.3"
 """
 
+import asyncio
 
 import httpx
 from sources.daikin.models import (
@@ -13,6 +14,10 @@ from sources.daikin.models import (
     DaikinInfo,
     parse_string_to_data,
 )
+
+
+class DaikinException(Exception):
+    """General exception for Daikin operations."""
 
 
 class DaikinClient:
@@ -37,9 +42,9 @@ class DaikinClient:
         """
         self.base_url = f"http://{base_url}"
         self.headers = headers or {}
-        self.client = httpx.Client(base_url=self.base_url, headers=self.headers)
+        self.client = httpx.AsyncClient(base_url=self.base_url, headers=self.headers)
 
-    def get(self, endpoint: str, params: dict = None) -> str:
+    async def get(self, endpoint: str, params: dict = None) -> str:
         """
         Sends a GET request to the specified endpoint.
 
@@ -51,10 +56,17 @@ class DaikinClient:
             dict: The JSON response from the server.
 
         """
-        response = self.client.get(endpoint, params=params)
-        response.raise_for_status()
-        parsed_data = parse_string_to_data(response.text)
-        return parsed_data
+        exception_message = ""
+        for _ in range(3):  # retry i-1 times if there's a failure
+            try:
+                response = await self.client.get(endpoint, params=params)
+                response.raise_for_status()
+                return parse_string_to_data(response.text)
+            except (httpx.RemoteProtocolError, httpx.HTTPStatusError) as exc:
+                await asyncio.sleep(1)
+                exception_message = str(exc)
+
+        raise DaikinException(f"Maximum retry attempts exceeded.{exception_message}")
 
     def post(self, endpoint: str, data: dict = None) -> dict:
         """
@@ -72,7 +84,7 @@ class DaikinClient:
         response.raise_for_status()
         return response.text
 
-    def get_basic_info(self) -> BasicInfo:
+    async def get_basic_info(self) -> BasicInfo:
         """
         Basic Info about Daikin
 
@@ -82,10 +94,10 @@ class DaikinClient:
             (TypeError, ValueError)
 
         """
-        response = self.get("/common/basic_info")
+        response = await self.get("/common/basic_info")
         return BasicInfo.parse_obj(response)
 
-    def get_sensor_info(self) -> SensorInfo:
+    async def get_sensor_info(self) -> SensorInfo:
         """
         GET request to the /aircon/get_sensor_info
 
@@ -93,15 +105,15 @@ class DaikinClient:
             SensorInfo: The parsed response
 
         """
-        response = self.get("/aircon/get_sensor_info")
+        response = await self.get("/aircon/get_sensor_info")
         return SensorInfo.parse_obj(response)
 
-    def get_daikin_info(self) -> DaikinInfo:
+    async def get_daikin_info(self) -> DaikinInfo:
         """
         Get Parsed Info
         """
-        basic = self.get_basic_info()
-        sensor = self.get_sensor_info()
+        basic = await self.get_basic_info()
+        sensor = await self.get_sensor_info()
         return DaikinInfo(
             name=basic.name,
             temperature=DaikinInfoTemp(indoor=sensor.htemp, outdoor=sensor.otemp),
@@ -113,4 +125,4 @@ class DaikinClient:
         Closes the HTTP client.
 
         """
-        self.client.close()
+        self.client.aclose()
