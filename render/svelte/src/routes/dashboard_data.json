@@ -1,0 +1,48 @@
+{
+    "date": {
+        "currentTime": "23:48",
+        "currentDay": "FRI",
+        "currentDate": "16JUN"
+    },
+    "nationalRail": {
+        "northboundTrains": [
+            {
+                "time": "00:01",
+                "destination": "LETCHWORTH GARDEN",
+                "status": "ON TIME",
+                "delay": "13 MINS"
+            },
+            {
+                "time": "00:31",
+                "destination": "LETCHWORTH GARDEN",
+                "status": "ON TIME",
+                "delay": "43 MINS"
+            },
+            {
+                "time": "01:21",
+                "destination": "HERTFORD NORTH",
+                "status": "ON TIME",
+                "delay": "1 HR 33 MINS"
+            }
+        ],
+        "southboundTrains": [
+            {
+                "time": "00:01",
+                "destination": "MOORGATE",
+                "status": "ON TIME",
+                "delay": "13 MINS"
+            },
+            {
+                "time": "00:16",
+                "destination": "MOORGATE",
+                "status": "ON TIME",
+                "delay": "28 MINS"
+            }
+        ]
+    },
+    "weather": {
+        "currentTemperature": "17°C",
+        "minTemperature": "15°C",
+        "maxTemperature": "18°C"
+    }
+}

@@ -8,14 +8,20 @@ import httpx
 import structlog
 from fastapi import HTTPException
 from PIL import Image
-from api.dependencies import APIConfig
 
 from render import Pillow
 from sources import NationalRail, Weather
 from waveshare_epd import epd7in5_V2
 
+from api.dependencies import APIConfig
+from api.render_webpage import render_webpage
 
 log = structlog.get_logger()
+
+# Render with webpage?
+USE_WEBPAGE = True
+# Send Directly via SPI?
+SEND_DIRECTLY = False
 
 
 def send_to_server(pil_image: Image):
@@ -39,6 +45,18 @@ def send_to_server(pil_image: Image):
         raise HTTPException(
             status_code=500, detail="Failed to send the bytearray to the server"
         )
+
+
+def send_to_display(pil_image: Image):
+    """
+    Send Data to Display
+    """
+    epd = epd7in5_V2.EPD()
+    log.info("Initializing the display...")
+    epd.init()
+    epd.display(epd.getbuffer(pil_image))
+    log.info("Sending Display to Sleep")
+    epd.sleep()
 
 
 def is_within_update_hours():
@@ -74,13 +92,11 @@ def get_weather():
     return temp
 
 
-def run_dashboard_update(api_config: APIConfig):
+def manually_generate_pil_image(api_config: APIConfig):
     """
-    Run dashboard update if between two hours
+    Manually generate PIL Image
+    Old Method
     """
-    if not is_within_update_hours():
-        log.info("Dashboard update disabled at this hour")
-        return
     rail_client = NationalRail.NationalRail(api_config.config.tokens.national_rail)
     pil_image = Pillow.render_pillow_dashboard(
         rail_nb=rail_client.get_departures(
@@ -95,8 +111,24 @@ def run_dashboard_update(api_config: APIConfig):
         ),
         temperature_data=get_weather(),
     )
+    pil_image.save("manual-pillow.png")
+    log.info("Generated Manual Pillow Image")
+    return pil_image
 
-    log.info("Displaying image and saving preview.png")
-    pil_image.save("preview.png")
-    # send_to_display(pil_image)
-    send_to_server(pil_image)
+
+async def run_dashboard_update(api_config: APIConfig):
+    """
+    Run dashboard update if between two hours
+    """
+
+    if not is_within_update_hours():
+        log.info("Dashboard update disabled at this hour")
+        return
+    if USE_WEBPAGE:
+        pil_image = await render_webpage()
+    else:
+        pil_image = manually_generate_pil_image(api_config)
+    if SEND_DIRECTLY:
+        send_to_display(pil_image)
+    else:
+        send_to_server(pil_image)

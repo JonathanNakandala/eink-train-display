@@ -1,0 +1,118 @@
+{
+    "rail": {
+        "northbound": {
+            "generatedAt": "2023-06-25T23:10:21.988188+01:00",
+            "locationName": "Hornsey",
+            "crs": "HRN",
+            "filterLocationName": "Winchmore Hill",
+            "filtercrs": "WIH",
+            "filterType": null,
+            "nrccMessages": null,
+            "platformAvailable": true,
+            "areServicesAvailable": null,
+            "trainServices": null,
+            "busServices": null,
+            "ferryServices": null
+        },
+        "southbound": {
+            "generatedAt": "2023-06-25T23:10:22.004201+01:00",
+            "locationName": "Hornsey",
+            "crs": "HRN",
+            "filterLocationName": "Finsbury Park",
+            "filtercrs": "FPK",
+            "filterType": null,
+            "nrccMessages": null,
+            "platformAvailable": true,
+            "areServicesAvailable": null,
+            "trainServices": null,
+            "busServices": null,
+            "ferryServices": null
+        }
+    },
+    "weather": {
+        "coord": {
+            "lon": -0.1237,
+            "lat": 51.5797
+        },
+        "weather": [
+            {
+                "id": 800,
+                "main": "Clear",
+                "description": "clear sky",
+                "icon": "01n"
+            }
+        ],
+        "base": "stations",
+        "main": {
+            "temp": 18.85,
+            "feels_like": 18.33,
+            "temp_min": 16.31,
+            "temp_max": 20.31,
+            "pressure": 1004,
+            "humidity": 59
+        },
+        "visibility": 10000,
+        "wind": {
+            "speed": 4.02,
+            "deg": 200
+        },
+        "clouds": {
+            "all": 5
+        },
+        "dt": "2023-06-25T23:10:21",
+        "sys": {
+            "type": 2,
+            "id": 2075535,
+            "country": "GB",
+            "sunrise": "2023-06-25T04:43:43",
+            "sunset": "2023-06-25T21:22:14"
+        },
+        "timezone": 3600,
+        "id": 6690565,
+        "name": "Crouch End",
+        "cod": 200
+    },
+    "time": "2023-06-25T23:10:23.741889",
+    "air_quality": {
+        "coord": {
+            "lon": -0.1237,
+            "lat": 51.5797
+        },
+        "list": [
+            {
+                "dt": "2023-06-25T23:07:51",
+                "main": {
+                    "aqi": 2
+                },
+                "components": {
+                    "co": 240.33,
+                    "no": 0.0,
+                    "no2": 6.77,
+                    "o3": 65.8,
+                    "so2": 2.86,
+                    "pm2_5": 2.3,
+                    "pm10": 3.38,
+                    "nh3": 0.95
+                }
+            }
+        ]
+    },
+    "aircon": [
+        {
+            "name": "Living Room",
+            "temperature": {
+                "indoor": 23.0,
+                "outdoor": 19.0
+            },
+            "humidity": 45
+        },
+        {
+            "name": "Bedroom",
+            "temperature": {
+                "indoor": 27.0,
+                "outdoor": 19.0
+            },
+            "humidity": 35
+        }
+    ]
+}
