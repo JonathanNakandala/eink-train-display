@@ -20,6 +20,21 @@ async def check_class_loaded(page):
     There's a CSS class called `loaded` that indicates page is loaded
     """
     await page.wait_for_selector(".container")
+
+    timeout = 30
+
+    try:
+        await asyncio.wait_for(check_loaded_class(page), timeout)
+    except asyncio.TimeoutError as exc:
+        raise asyncio.TimeoutError(
+            f"Waiting for page load timed out after {timeout} seconds"
+        ) from exc
+
+
+async def check_loaded_class(page):
+    """
+    Evaluate Javascript to check if class is loaded
+    """
     while not await page.evaluate(
         """() => {
         let container = document.querySelector(".container");
