@@ -3,6 +3,7 @@ Scheduler Operations
 """
 
 from datetime import datetime, timedelta
+import pytz
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
@@ -78,9 +79,10 @@ async def get_dashboard_data(
     aircon_data = []
     for aircon in api_config.config.aircon.endpoints:
         aircon_data.append(Daikin.DaikinClient(aircon).get_daikin_info())
-
+    now_utc = datetime.now(pytz.timezone("UTC"))
+    now_london = now_utc.astimezone(pytz.timezone("Europe/London"))
     dashboard_data = DashboardInputData(
-        time=datetime.now(),
+        time=now_london,
         rail=RailwayInformation(
             northbound=northbound_trains, southbound=southbound_trains
         ),

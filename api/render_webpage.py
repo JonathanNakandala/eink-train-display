@@ -1,66 +1,69 @@
 """
 Use Playwright to render page
 """
+import os
 import io
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-from pathlib import Path
-from threading import Thread
-from playwright.sync_api import sync_playwright
+import asyncio
+
+from playwright.async_api import async_playwright
 from PIL import Image
 from structlog import get_logger
-from .utils import send_to_server
+
 
 log = get_logger()
 
-PORT = 8927
+DEFAULT_URL = "http://localhost:8000/index.html"
 
 
-def start_http_server(port, directory):
-    class Handler(SimpleHTTPRequestHandler):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, directory=directory, **kwargs)
+async def check_class_loaded(page):
+    """
+    There's a CSS class called `loaded` that indicates page is loaded
+    """
+    await page.wait_for_selector(".container")
+    while not await page.evaluate(
+        """() => {
+        let container = document.querySelector(".container");
+        return container ? container.classList.contains("loaded") : false;
+    }"""
+    ):
+        await asyncio.sleep(0.05)
 
-    httpd = HTTPServer(("localhost", port), Handler)
-    httpd.serve_forever()
+
+async def generate_image(page):
+    """
+    Once the page has loaded, generate screenshot
+    The screenshot it stored in a file and returned as a Pillow Image
+    """
+    await page.screenshot(path="playwright-screenshot.png")
+    screenshot_data = await page.screenshot(type="png")
+    pil_image = Image.open(io.BytesIO(screenshot_data))
+    pil_image = pil_image.convert("L")  # greyscale
+    threshold = 128  # If it's a 0 or a 1 in the B/W image
+    pil_image = pil_image.point(lambda p: p > threshold and 255)
+    log.info(f"Image Dimensions: {pil_image.size}")
+    return pil_image
 
 
-def render_webpage() -> Image:
+async def render_webpage(url=DEFAULT_URL) -> Image:
     """
     Create a browser instance that renders the page
     """
-    webpage_path = (
-        Path(__file__).resolve().parent / ".." / "render" / "svelte" / "build"
-    ).resolve()
-    server_thread = Thread(target=start_http_server, args=(PORT, webpage_path))
-    server_thread.daemon = True
-    server_thread.start()
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(args=["--disable-web-security"])
-        context = browser.new_context(viewport={"width": 800, "height": 480})
-        page = context.new_page()
 
-        log.info("Loading Webpage")
+    async with async_playwright() as playwright:
+        browser = await playwright.firefox.launch(args=["--disable-web-security"])
+        context = await browser.new_context(
+            viewport={"width": 800, "height": 480}, timezone_id="Europe/London"
+        )
+        page = await context.new_page()
+
         page.on("console", lambda msg: log.info(msg.text))
-        page.goto(f"http://localhost:{PORT}/index.html")
 
-        def check_class_loaded():
-            return page.evaluate(
-                """() => {
-                return document.querySelector(".container").classList.contains("loaded");
-            }"""
-            )
+        page_url = os.getenv("PAGE_URL", url)
+        log.info("Loading Webpage", url=page_url)
+        await page.goto(page_url)
 
-        while not check_class_loaded():
-            pass
+        await check_class_loaded(page)
+        image = await generate_image(page)
 
-        page.screenshot(path="playwright-screenshot.png")
-        screenshot_data = page.screenshot(type="png")
-        pil_image = Image.open(io.BytesIO(screenshot_data))
-        pil_image = pil_image.convert("L")
-        # Convert the image to binary black and white using a threshold value
-        threshold = 128  # Adjust the threshold value as needed
-        pil_image = pil_image.point(lambda p: p > threshold and 255)
-        log.info(f"Image Dimensions: {pil_image.size}")
-        browser.close()
-        send_to_server(pil_image)
-        return pil_image
+        await browser.close()
+        return image

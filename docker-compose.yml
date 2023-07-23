@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      PAGE_URL: "http://webpage:8927/index.html"
+    networks:
+      - eink
+
+  webpage:
+    build:
+      context: ./render/svelte
+      dockerfile: Dockerfile
+      args:
+        VITE_USE_API: "True"
+        VITE_DASHBOARD_URL: "http://api:8000/get_dashboard_data"
+    ports:
+      - 8927:8927
+    depends_on:
+      - api
+    networks:
+      - eink
+
+networks:
+  eink:

@@ -14,7 +14,7 @@ import uvicorn
 from .log_setup import setup_logging
 
 from .utils import run_dashboard_update
-from .render_webpage import render_webpage
+
 from .routers import schedule
 from .dependencies import Scheduler, get_apiconfig
 
@@ -26,13 +26,13 @@ async def lifespan(fast_app: FastAPI):
     """
     FastAPI Startup/Shutdown
     """
-    api_config = get_apiconfig()
     fast_app.state.scheduler = Scheduler()
     fast_app.state.scheduler.scheduler.add_job(
-        render_webpage,
-        "interval",
-        args=[],
-        seconds=5 * 60,  # 5 minutes
+        run_dashboard_update,
+        "cron",
+        args=[get_apiconfig()],
+        minute="*",
+        second="0",
         next_run_time=datetime.datetime.now(),
     )
     fast_app.state.scheduler.scheduler.start()
@@ -43,7 +43,7 @@ async def lifespan(fast_app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex="http(s)?://localhost(:\d+)?",
+    allow_origin_regex="http(s)?://(localhost|webpage)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,7 +55,7 @@ def start_uvicorn(async_loop: asyncio.AbstractEventLoop):
     """
     Start Server
     """
-    config = uvicorn.Config(app, loop=loop, reload=True)
+    config = uvicorn.Config(app, loop=loop, reload=True, host="0.0.0.0")
     server = uvicorn.Server(config)
     async_loop.run_until_complete(server.serve())
 

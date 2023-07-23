@@ -159,7 +159,7 @@ interface Temperature {
     outdoor: number;
 }
 
-interface AirconData {
+export interface AirconData {
     name: string;
     temperature: Temperature;
     humidity: number;
@@ -172,4 +172,11 @@ export interface DashboardInputData {
     time: string;
     air_quality: AirQualityData
     aircon: AirconData[]
+}
+
+export interface Train {
+    time: string;
+    destination: string;
+    status: string;
+    delay: string;
 }
