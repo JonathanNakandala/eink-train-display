@@ -32,6 +32,7 @@
 		loading = true;
 		if (useAPI) {
 			try {
+				console.log('Fetching Data from: ' + sourcePath);
 				const res = await fetch(sourcePath);
 				if (!res.ok) throw new Error('Failed to fetch');
 				dashboardData = await res.json();
