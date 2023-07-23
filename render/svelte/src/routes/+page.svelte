@@ -14,7 +14,7 @@
 	export let dashboardData: DashboardInputData;
 	export let loaded = false;
 
-	const useAPI = import.meta.env.VITE_USE_API === 'true';
+	const useAPI = import.meta.env.VITE_USE_API !== 'false';
 	const sourcePath = import.meta.env.VITE_DASHBOARD_URL;
 
 	let currentTime: string, currentDay: string, currentDate: string;
