@@ -1,14 +1,17 @@
 """
 National Rail SOAP API
 """
+from pathlib import Path
+
 from pydantic import ValidationError
+import httpx
 import structlog
 
-from zeep import Client, xsd
+from zeep import xsd, AsyncClient
 from zeep.exceptions import Fault
 from zeep.helpers import serialize_object
 from zeep.plugins import HistoryPlugin
-
+from zeep.transports import AsyncTransport
 from .models import DeparturesResponse
 
 log = structlog.get_logger()
@@ -19,7 +22,9 @@ class NationalRail:
     Class to fetch stuff from National Rail's API
     """
 
-    WSDL = "http://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01"
+    # WSDL = "http://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2017-10-01"
+    WSDL = str(Path(__file__).parent / "wsdl/rtti_2017-10-01_ldb.wsdl")
+
     header = xsd.Element(
         "{http://thalesgroup.com/RTTI/2013-11-28/Token/types}AccessToken",
         xsd.ComplexType(
@@ -34,9 +39,16 @@ class NationalRail:
 
     def __init__(self, token):
         self.header_value = self.header(TokenValue=token)
-        self.client = Client(wsdl=self.WSDL, plugins=[HistoryPlugin()])
+        httpx_client = httpx.AsyncClient()
+        self.client = AsyncClient(
+            wsdl=self.WSDL,
+            transport=AsyncTransport(client=httpx_client),
+            plugins=[HistoryPlugin()],
+        )
 
-    def get_departures(self, num_rows, at_station, to_station):
+        # Client(wsdl=self.WSDL, plugins=[HistoryPlugin()])
+
+    async def get_departures(self, num_rows, at_station, to_station):
         """
         Gets Departures from a station based on From and to
 
@@ -56,7 +68,7 @@ class NationalRail:
                 at_station=at_station,
                 to_station=to_station,
             )
-            response = self.client.service.GetDepartureBoard(
+            response = await self.client.service.GetDepartureBoard(
                 numRows=num_rows,
                 crs=at_station,
                 filterCrs=to_station,
