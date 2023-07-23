@@ -51,7 +51,7 @@ class AirConConfig(BaseSettings):
     endpoints: list[str]
 
 
-class Config(BaseSettings):
+class ConfigVars(BaseSettings):
     """
     Application Configuration Class
     """
@@ -63,7 +63,7 @@ class Config(BaseSettings):
     aircon: AirConConfig
 
 
-def load_config() -> Config:
+def load_config() -> ConfigVars:
     """
     Load and Return the Config from configuration.ini
     """
@@ -83,4 +83,4 @@ def load_config() -> Config:
         },
     }
 
-    return Config(**config_dict)
+    return ConfigVars(**config_dict)

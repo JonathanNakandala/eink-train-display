@@ -7,7 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.job import Job
 from fastapi import Request
 import structlog
-from config import load_config
+from api.config import load_config, ConfigVars
 
 log = structlog.get_logger()
 
@@ -45,7 +45,7 @@ class APIConfig:
         """
         Create Scheduler
         """
-        self.config = load_config()
+        self.config: ConfigVars = load_config()
 
     def set_job(self, job: Job):
         """
